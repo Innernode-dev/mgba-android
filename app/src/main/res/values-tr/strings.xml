@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">mGBA</string>
+    <string name="tab_gba">GBA</string>
+    <string name="tab_gb">GB</string>
+    <string name="tab_gbc">GBC</string>
+    <string name="author_tester">Fikir Ortağı &amp; Baş Testçi: KatOriginal</string>
+    <string name="empty_library_desc">Oynamaya başlamak için GBA, GB veya GBC klasörü seçin</string>
+    <string name="open_source_notice">Forklara, iyileştirmelere ve pull requestlere açıktır</string>
+    <string name="empty_library_button">ROM Klasörü Seç</string>
+    <string name="screen_size">Ekran Boyutu</string>
+    <string name="quick_load">Hızlı Yükle</string>
+    <string name="hotkeys">Kısayol Tuşları</string>
+    <string name="resume_game">Oyuna Devam Et</string>
+    <string name="screen_rotation">Ekran Yönü</string>
+    <string name="menu_graphics">Grafik</string>
+    <string name="dpad_style">D-Pad Stili</string>
+    <string name="ab_layout">A/B Düzeni</string>
+    <string name="pause_menu">Duraklatma Menüsü</string>
+    <string name="contact_dev">Geliştiriciye Ulaşın</string>
+    <string name="author_lead">Baş Geliştirici: Inner Dev</string>
+    <string name="menu_saves">Kayıt Yöneticisi</string>
+    <string name="button_opacity">Buton Saydamlığı</string>
+    <string name="tab_all">Tümü</string>
+    <string name="btn_settings">Ayarlar</string>
+    <string name="quick_save">Hızlı Kayıt</string>
+    <string name="btn_refresh">Yenile</string>
+    <string name="menu_controls">Kontroller</string>
+    <string name="support_project">Projeyi Destekle (DonationAlerts)</string>
+    <string name="search_hint">Oyun, bölge, kod ara...</string>
+    <string name="btn_add_folder">Klasör Ekle</string>
+    <string name="tab_favorites">Favoriler</string>
+    <string name="save_and_exit">Kaydet ve Çık</string>
+    <string name="menu_covers">Kapak Yöneticisi</string>
+    <string name="menu_about">Hakkında</string>
+    <string name="smoothing">Yumuşatma</string>
+    <string name="touch_controls">Dokunmatik Butonlar</string>
+    <string name="gamepad_mapping">Gamepad Tuş Atama (Xbox)</string>
+    <string name="empty_library_title">Kütüphane Boş</string>
+</resources>

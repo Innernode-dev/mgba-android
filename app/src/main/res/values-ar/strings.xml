@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">mGBA</string>
+    <string name="tab_gba">GBA</string>
+    <string name="tab_gb">GB</string>
+    <string name="tab_gbc">GBC</string>
+    <string name="author_tester">صاحب الفكرة والمختبر الرئيسي: KatOriginal</string>
+    <string name="empty_library_desc">حدد مجلداً يحتوي على ألعاب GBA أو GB أو GBC</string>
+    <string name="open_source_notice">مفتوح المصدر للنسخ والتطوير والمساهمات</string>
+    <string name="empty_library_button">اختيار مجلد الألعاب</string>
+    <string name="screen_size">حجم الشاشة</string>
+    <string name="quick_load">تحميل سريع</string>
+    <string name="hotkeys">مفاتيح الاختصار</string>
+    <string name="resume_game">استئناف اللعب</string>
+    <string name="screen_rotation">اتجاه الشاشة</string>
+    <string name="menu_graphics">الرسومات</string>
+    <string name="dpad_style">نمط أزرار الاتجاهات</string>
+    <string name="ab_layout">ترتيب A/B</string>
+    <string name="pause_menu">قائمة الإيقاف المؤقت</string>
+    <string name="contact_dev">اتصل بالمطور</string>
+    <string name="author_lead">المطور الرئيسي: Inner Dev</string>
+    <string name="menu_saves">إدارة الحفظ</string>
+    <string name="button_opacity">شفافية الأزرار</string>
+    <string name="tab_all">الكل</string>
+    <string name="btn_settings">الإعدادات</string>
+    <string name="quick_save">حفظ سريع</string>
+    <string name="btn_refresh">تحديث</string>
+    <string name="menu_controls">التحكم</string>
+    <string name="support_project">دعم المشروع (DonationAlerts)</string>
+    <string name="search_hint">بحث عن الألعاب، المناطق، الرموز...</string>
+    <string name="btn_add_folder">إضافة مجلد</string>
+    <string name="tab_favorites">المفضلة</string>
+    <string name="save_and_exit">حفظ والخروج</string>
+    <string name="menu_covers">إدارة الأغلفة</string>
+    <string name="menu_about">حول التطبيق</string>
+    <string name="smoothing">تنعيم الصورة</string>
+    <string name="touch_controls">أزرار الشاشة</string>
+    <string name="gamepad_mapping">تعيين يد التحكم (Xbox)</string>
+    <string name="empty_library_title">المكتبة فارغة</string>
+</resources>

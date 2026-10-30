@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">mGBA</string>
+    <string name="tab_all">Todos</string>
+    <string name="tab_gba">GBA</string>
+    <string name="tab_gb">GB</string>
+    <string name="tab_gbc">GBC</string>
+    <string name="tab_favorites">Favoritos</string>
+    <string name="search_hint">Pesquisar jogos, regiões, códigos...</string>
+    <string name="btn_add_folder">Adicionar pasta</string>
+    <string name="btn_refresh">Atualizar</string>
+    <string name="btn_settings">Configurações</string>
+    <string name="empty_library_title">A biblioteca está vazia</string>
+    <string name="empty_library_desc">Selecione uma pasta com jogos GBA, GB ou GBC para começar</string>
+    <string name="empty_library_button">Selecionar pasta de ROMs</string>
+    <string name="menu_graphics">Gráficos</string>
+    <string name="menu_controls">Controles</string>
+    <string name="menu_saves">Gerenciador de Saves</string>
+    <string name="menu_covers">Gerenciador de Capas</string>
+    <string name="menu_about">Sobre</string>
+    <string name="screen_size">Tamanho da tela</string>
+    <string name="smoothing">Suavização</string>
+    <string name="screen_rotation">Orientação da tela</string>
+    <string name="touch_controls">Botões na tela</string>
+    <string name="dpad_style">Estilo do D-Pad</string>
+    <string name="button_opacity">Opacidade dos botões</string>
+    <string name="ab_layout">Disposição A/B</string>
+    <string name="gamepad_mapping">Mapeamento de controle (Xbox)</string>
+    <string name="hotkeys">Teclas de atalho</string>
+    <string name="quick_save">Salvamento rápido</string>
+    <string name="quick_load">Carregamento rápido</string>
+    <string name="pause_menu">Menu de pausa</string>
+    <string name="resume_game">Continuar jogo</string>
+    <string name="save_and_exit">Salvar e sair para o menu</string>
+    <string name="support_project">Apoiar o projeto (DonationAlerts)</string>
+    <string name="contact_dev">Contatar desenvolvedor</string>
+    <string name="author_lead">Desenvolvedor principal: Inner Dev</string>
+    <string name="author_tester">Coautor &amp; Tester principal: KatOriginal</string>
+    <string name="open_source_notice">Aberto para forks, melhorias e pull requests</string>
+</resources>

@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">mGBA</string>
+    <string name="tab_gba">GBA</string>
+    <string name="tab_gb">GB</string>
+    <string name="tab_gbc">GBC</string>
+    <string name="author_tester">सह-निर्माता और लीड टेस्टर: KatOriginal</string>
+    <string name="empty_library_desc">खेलने के लिए GBA, GB या GBC गेम वाला फ़ोल्डर चुनें</string>
+    <string name="open_source_notice">फोर्क, सुधार और पुल अनुरोधों के लिए खुला है</string>
+    <string name="empty_library_button">ROM फ़ोल्डर चुनें</string>
+    <string name="screen_size">स्क्रीन का आकार</string>
+    <string name="quick_load">त्वरित लोड</string>
+    <string name="hotkeys">हॉटकी</string>
+    <string name="resume_game">गेम जारी रखें</string>
+    <string name="screen_rotation">स्क्रीन ओरिएंटेशन</string>
+    <string name="menu_graphics">ग्राफ़िक्स</string>
+    <string name="dpad_style">D-Pad शैली</string>
+    <string name="ab_layout">A/B लेआउट</string>
+    <string name="pause_menu">पॉज़ मेनू</string>
+    <string name="contact_dev">डेवलपर से संपर्क करें</string>
+    <string name="author_lead">प्रमुख डेवलपर: Inner Dev</string>
+    <string name="menu_saves">सेव मैनेजर</string>
+    <string name="button_opacity">बटन पारदर्शिता</string>
+    <string name="tab_all">सभी</string>
+    <string name="btn_settings">सेटिंग्स</string>
+    <string name="quick_save">त्वरित सेव</string>
+    <string name="btn_refresh">रिफ्रेश करें</string>
+    <string name="menu_controls">नियंत्रण</string>
+    <string name="support_project">प्रोजेक्ट का समर्थन करें (DonationAlerts)</string>
+    <string name="search_hint">गेम, क्षेत्र, कोड खोजें...</string>
+    <string name="btn_add_folder">फ़ोल्डर जोड़ें</string>
+    <string name="tab_favorites">पसंदीदा</string>
+    <string name="save_and_exit">सेव करें और बाहर निकलें</string>
+    <string name="menu_covers">कवर मैनेजर</string>
+    <string name="menu_about">के बारे में</string>
+    <string name="smoothing">स्मूथिंग</string>
+    <string name="touch_controls">स्क्रीन बटन</string>
+    <string name="gamepad_mapping">गेमपैड बटन मैपिंग (Xbox)</string>
+    <string name="empty_library_title">लाइब्रेरी खाली है</string>
+</resources>

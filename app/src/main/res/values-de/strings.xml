@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">mGBA</string>
+    <string name="tab_gba">GBA</string>
+    <string name="tab_gb">GB</string>
+    <string name="tab_gbc">GBC</string>
+    <string name="author_tester">Koautor &amp; Haupttester: KatOriginal</string>
+    <string name="empty_library_desc">Wähle einen Ordner mit GBA-, GB- oder GBC-Spielen</string>
+    <string name="open_source_notice">Offen für Forks, Verbesserungen und Pull-Requests</string>
+    <string name="empty_library_button">ROM-Ordner auswählen</string>
+    <string name="screen_size">Bildschirmgröße</string>
+    <string name="quick_load">Schnellladen</string>
+    <string name="hotkeys">Hotkeys</string>
+    <string name="resume_game">Spiel fortsetzen</string>
+    <string name="screen_rotation">Bildschirmausrichtung</string>
+    <string name="menu_graphics">Grafik</string>
+    <string name="dpad_style">Steuerkreuz-Stil</string>
+    <string name="ab_layout">A/B-Belegung</string>
+    <string name="pause_menu">Pause-Menü</string>
+    <string name="contact_dev">Entwickler kontaktieren</string>
+    <string name="author_lead">Hauptentwickler: Inner Dev</string>
+    <string name="menu_saves">Spielstand-Manager</string>
+    <string name="button_opacity">Tastentransparenz</string>
+    <string name="tab_all">Alle</string>
+    <string name="btn_settings">Einstellungen</string>
+    <string name="quick_save">Schnellspeichern</string>
+    <string name="btn_refresh">Aktualisieren</string>
+    <string name="menu_controls">Steuerung</string>
+    <string name="support_project">Projekt unterstützen (DonationAlerts)</string>
+    <string name="search_hint">Spiele, Regionen, Codes suchen...</string>
+    <string name="btn_add_folder">Ordner hinzufügen</string>
+    <string name="tab_favorites">Favoriten</string>
+    <string name="save_and_exit">Speichern und beenden</string>
+    <string name="menu_covers">Cover-Manager</string>
+    <string name="menu_about">Über die App</string>
+    <string name="smoothing">Glättung</string>
+    <string name="touch_controls">Touch-Tasten</string>
+    <string name="gamepad_mapping">Gamepad-Tastenbelegung (Xbox)</string>
+    <string name="empty_library_title">Bibliothek ist leer</string>
+</resources>
+

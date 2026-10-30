@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">mGBA</string>
+    <string name="tab_gba">GBA</string>
+    <string name="tab_gb">GB</string>
+    <string name="tab_gbc">GBC</string>
+    <string name="author_tester">Співавтор ідеї &amp; головний тестер: KatOriginal</string>
+    <string name="empty_library_desc">Виберіть папку з іграми GBA, GB або GBC, щоб почати гру</string>
+    <string name="open_source_notice">Відкрито для форків, покращень та pull request-ів</string>
+    <string name="empty_library_button">Обрати папку ROM</string>
+    <string name="screen_size">Розмір екрана</string>
+    <string name="quick_load">Швидке завантаження</string>
+    <string name="hotkeys">Гарячі клавіші</string>
+    <string name="resume_game">Продовжити гру</string>
+    <string name="screen_rotation">Орієнтація екрана</string>
+    <string name="menu_graphics">Графіка</string>
+    <string name="dpad_style">Вид хрестовини</string>
+    <string name="ab_layout">Розкладка A/B</string>
+    <string name="pause_menu">Меню паузи</string>
+    <string name="contact_dev">Зв\'язатися з розробником</string>
+    <string name="author_lead">Головний розробник: Inner Dev</string>
+    <string name="menu_saves">Менеджер збережень</string>
+    <string name="button_opacity">Прозорість кнопок</string>
+    <string name="tab_all">Усі</string>
+    <string name="btn_settings">Налаштування</string>
+    <string name="quick_save">Швидке збереження</string>
+    <string name="btn_refresh">Оновити</string>
+    <string name="menu_controls">Керування</string>
+    <string name="support_project">Підтримати проєкт (DonationAlerts)</string>
+    <string name="search_hint">Пошук ігор, регіонів, кодів...</string>
+    <string name="btn_add_folder">Додати папку</string>
+    <string name="tab_favorites">Обране</string>
+    <string name="save_and_exit">Зберегти та вийти</string>
+    <string name="menu_covers">Менеджер обкладинок</string>
+    <string name="menu_about">Про додаток</string>
+    <string name="smoothing">Згладжування</string>
+    <string name="touch_controls">Екранні кнопки</string>
+    <string name="gamepad_mapping">Призначення кнопок геймпада (Xbox)</string>
+    <string name="empty_library_title">Бібліотека порожня</string>
+</resources>

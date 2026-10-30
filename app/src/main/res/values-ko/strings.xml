@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">mGBA</string>
+    <string name="tab_gba">GBA</string>
+    <string name="tab_gb">GB</string>
+    <string name="tab_gbc">GBC</string>
+    <string name="author_tester">공동 기획 및 수석 테스터: KatOriginal</string>
+    <string name="empty_library_desc">GBA, GB 또는 GBC 게임이 포함된 폴더를 선택하세요</string>
+    <string name="open_source_notice">포크, 개선 및 풀 리퀘스트를 환영합니다</string>
+    <string name="empty_library_button">ROM 폴더 선택</string>
+    <string name="screen_size">화면 크기</string>
+    <string name="quick_load">빠른 불러오기</string>
+    <string name="hotkeys">단축키</string>
+    <string name="resume_game">게임 계속하기</string>
+    <string name="screen_rotation">화면 방향</string>
+    <string name="menu_graphics">그래픽</string>
+    <string name="dpad_style">방향키 스타일</string>
+    <string name="ab_layout">A/B 버튼 배치</string>
+    <string name="pause_menu">일시 정지 메뉴</string>
+    <string name="contact_dev">개발자에게 문의</string>
+    <string name="author_lead">리드 개발자: Inner Dev</string>
+    <string name="menu_saves">세이브 매니저</string>
+    <string name="button_opacity">버튼 투명도</string>
+    <string name="tab_all">전체</string>
+    <string name="btn_settings">설정</string>
+    <string name="quick_save">빠른 저장</string>
+    <string name="btn_refresh">새로고침</string>
+    <string name="menu_controls">컨트롤</string>
+    <string name="support_project">프로젝트 후원 (DonationAlerts)</string>
+    <string name="search_hint">게임, 지역, 코드 검색...</string>
+    <string name="btn_add_folder">폴더 추가</string>
+    <string name="tab_favorites">즐겨찾기</string>
+    <string name="save_and_exit">저장 후 나가기</string>
+    <string name="menu_covers">커버 매니저</string>
+    <string name="menu_about">정보</string>
+    <string name="smoothing">스무딩 필터</string>
+    <string name="touch_controls">가상 터치 버튼</string>
+    <string name="gamepad_mapping">게임패드 매핑 (Xbox)</string>
+    <string name="empty_library_title">라이브러리가 비어 있습니다</string>
+</resources>

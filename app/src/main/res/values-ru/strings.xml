@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">mGBA</string>
+    <string name="tab_all">Все</string>
+    <string name="tab_gba">GBA</string>
+    <string name="tab_gb">GB</string>
+    <string name="tab_gbc">GBC</string>
+    <string name="tab_favorites">Избранное</string>
+    <string name="search_hint">Поиск игр, регионов, кодов...</string>
+    <string name="btn_add_folder">Добавить папку</string>
+    <string name="btn_refresh">Обновить</string>
+    <string name="btn_settings">Настройки</string>
+    <string name="empty_library_title">Библиотека пуста</string>
+    <string name="empty_library_desc">Выберите папку с играми GBA, GB или GBC, чтобы начать играть</string>
+    <string name="empty_library_button">Выбрать папку с играми</string>
+    <string name="menu_graphics">Графика</string>
+    <string name="menu_controls">Управление</string>
+    <string name="menu_saves">Менеджер сохранений</string>
+    <string name="menu_covers">Менеджер обложек</string>
+    <string name="menu_about">О приложении</string>
+    <string name="screen_size">Размер экрана</string>
+    <string name="smoothing">Сглаживание</string>
+    <string name="screen_rotation">Поворот экрана</string>
+    <string name="touch_controls">Экранные кнопки</string>
+    <string name="dpad_style">Вид экранных кнопок</string>
+    <string name="button_opacity">Прозрачность кнопок</string>
+    <string name="ab_layout">Раскладка кнопок A/B</string>
+    <string name="gamepad_mapping">Назначение кнопок геймпада (Xbox)</string>
+    <string name="hotkeys">Быстрые клавиши</string>
+    <string name="quick_save">Быстрое сохранение</string>
+    <string name="quick_load">Быстрая загрузка</string>
+    <string name="pause_menu">Меню паузы</string>
+    <string name="resume_game">Продолжить игру</string>
+    <string name="save_and_exit">Сохранить и выйти в меню</string>
+    <string name="support_project">Поддержать проект (DonationAlerts)</string>
+    <string name="contact_dev">Связаться с разработчиком</string>
+    <string name="author_lead">Разработчик приложения: Inner Dev</string>
+    <string name="author_tester">Со-автор идеи &amp; главный тестер: KatOriginal</string>
+    <string name="open_source_notice">Проект открыт для форков, улучшений и пулл-реквестов</string>
+</resources>

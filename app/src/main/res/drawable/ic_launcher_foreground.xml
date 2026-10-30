@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  oGBA Launcher Icon - Adaptive Icon Foreground Layer
+  A stylised GBA console viewed from above with glowing "oGBA" text on screen.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- GBA body - purple rounded rectangle -->
+    <path
+        android:fillColor="#5B2D9E"
+        android:pathData="M12,32 Q12,24 20,24 L88,24 Q96,24 96,32 L96,76 Q96,84 88,84 L20,84 Q12,84 12,76 Z" />
+
+    <!-- GBA body highlight top -->
+    <path
+        android:fillColor="#7B4DBE"
+        android:pathData="M12,32 Q12,24 20,24 L88,24 Q96,24 96,32 L96,42 L12,42 Z" />
+
+    <!-- Screen bezel - dark purple -->
+    <path
+        android:fillColor="#2A1060"
+        android:pathData="M24,30 Q24,27 27,27 L60,27 Q63,27 63,30 L63,70 Q63,73 60,73 L27,73 Q24,73 24,70 Z" />
+
+    <!-- Screen - dark with glow -->
+    <path
+        android:fillColor="#0D0828"
+        android:pathData="M26,32 Q26,29 29,29 L58,29 Q61,29 61,32 L61,68 Q61,71 58,71 L29,71 Q26,71 26,68 Z" />
+
+    <!-- Screen glow inner -->
+    <path
+        android:fillColor="#1A0F50"
+        android:pathData="M28,34 L59,34 L59,66 L28,66 Z" />
+
+    <!-- "o" letter on screen - cyan glow -->
+    <path
+        android:fillColor="#00E5FF"
+        android:pathData="M32,44 Q32,40 36,40 Q40,40 40,44 L40,56 Q40,60 36,60 Q32,60 32,56 Z
+                          M34,44 L34,56 Q34,58 36,58 Q38,58 38,56 L38,44 Q38,42 36,42 Q34,42 34,44 Z" />
+
+    <!-- "G" letter -->
+    <path
+        android:fillColor="#00E5FF"
+        android:pathData="M42,40 L50,40 L50,42 L44,42 L44,58 L50,58 L50,50 L47,50 L47,52 L48,52 L48,56 L46,56 L46,50 L52,50 L52,60 L42,60 Z" />
+
+    <!-- "B" letter -->
+    <path
+        android:fillColor="#00E5FF"
+        android:pathData="M54,40 L54,60 L60,60 Q63,60 63,56 Q63,52 60,51 Q63,50 63,46 Q63,40 60,40 Z
+                          M56,42 L59,42 Q61,42 61,46 Q61,49 59,49 L56,49 Z
+                          M56,51 L59,51 Q61,51 61,56 Q61,58 59,58 L56,58 Z" />
+
+    <!-- "A" letter -->
+    <path
+        android:fillColor="#00E5FF"
+        android:pathData="M65,60 L69,40 L73,40 L77,60 L75,60 L71,42 L67,60 Z
+                          M67.5,53 L74.5,53 L74.5,55 L67.5,55 Z" />
+
+    <!-- Screen scan-line subtle effect -->
+    <path
+        android:fillColor="#3000FFFF"
+        android:pathData="M28,36 L59,36 L59,37 L28,37 Z" />
+    <path
+        android:fillColor="#3000FFFF"
+        android:pathData="M28,42 L59,42 L59,43 L28,43 Z" />
+    <path
+        android:fillColor="#3000FFFF"
+        android:pathData="M28,48 L59,48 L59,49 L28,49 Z" />
+    <path
+        android:fillColor="#3000FFFF"
+        android:pathData="M28,54 L59,54 L59,55 L28,55 Z" />
+    <path
+        android:fillColor="#3000FFFF"
+        android:pathData="M28,60 L59,60 L59,61 L28,61 Z" />
+
+    <!-- D-Pad horizontal bar -->
+    <path
+        android:fillColor="#3D1B7A"
+        android:pathData="M70,48 L82,48 L82,52 L70,52 Z" />
+    <!-- D-Pad vertical bar -->
+    <path
+        android:fillColor="#3D1B7A"
+        android:pathData="M74,44 L78,44 L78,56 L74,56 Z" />
+    <!-- D-Pad center -->
+    <path
+        android:fillColor="#4A2490"
+        android:pathData="M74,48 L78,48 L78,52 L74,52 Z" />
+
+    <!-- A button - red -->
+    <path
+        android:fillColor="#E53935"
+        android:pathData="M88,44 A4,4 0 0,1 96,44 A4,4 0 0,1 88,44 Z" />
+    <path
+        android:fillColor="#EF5350"
+        android:pathData="M89,43 A3,3 0 0,1 95,43 A3,3 0 0,1 89,43 Z" />
+
+    <!-- B button - blue -->
+    <path
+        android:fillColor="#1976D2"
+        android:pathData="M83,52 A4,4 0 0,1 91,52 A4,4 0 0,1 83,52 Z" />
+    <path
+        android:fillColor="#1E88E5"
+        android:pathData="M84,51 A3,3 0 0,1 90,51 A3,3 0 0,1 84,51 Z" />
+
+    <!-- L shoulder button -->
+    <path
+        android:fillColor="#4A2490"
+        android:pathData="M12,24 Q12,20 16,20 L32,20 L32,24 Z" />
+
+    <!-- R shoulder button -->
+    <path
+        android:fillColor="#4A2490"
+        android:pathData="M76,20 L92,20 Q96,20 96,24 L76,24 Z" />
+
+    <!-- Start button -->
+    <path
+        android:fillColor="#3D1B7A"
+        android:pathData="M70,64 Q70,62 72,62 L76,62 Q78,62 78,64 Q78,66 76,66 L72,66 Q70,66 70,64 Z" />
+
+    <!-- Select button -->
+    <path
+        android:fillColor="#3D1B7A"
+        android:pathData="M63,64 Q63,62 65,62 L69,62 Q71,62 71,64 Q71,66 69,66 L65,66 Q63,66 63,64 Z" />
+
+</vector>

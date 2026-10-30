@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">mGBA</string>
+    <string name="tab_gba">GBA</string>
+    <string name="tab_gb">GB</string>
+    <string name="tab_gbc">GBC</string>
+    <string name="author_tester">ผู้ร่วมคิดค้น &amp; ผู้ทดสอบหลัก: KatOriginal</string>
+    <string name="empty_library_desc">เลือกโฟลเดอร์ที่มีเกม GBA, GB หรือ GBC เพื่อเริ่มเล่น</string>
+    <string name="open_source_notice">เปิดกว้างสำหรับ Fork และ Pull Request</string>
+    <string name="empty_library_button">เลือกโฟลเดอร์ ROM</string>
+    <string name="screen_size">ขนาดหน้าจอ</string>
+    <string name="quick_load">โหลดด่วน</string>
+    <string name="hotkeys">ปุ่มลัด</string>
+    <string name="resume_game">เล่นต่อ</string>
+    <string name="screen_rotation">ทิศทางหน้าจอ</string>
+    <string name="menu_graphics">กราฟิก</string>
+    <string name="dpad_style">รูปแบบ D-Pad</string>
+    <string name="ab_layout">เค้าโครงปุ่ม A/B</string>
+    <string name="pause_menu">เมนูหยุดชั่วคราว</string>
+    <string name="contact_dev">ติดต่อผู้พัฒนา</string>
+    <string name="author_lead">ผู้พัฒนาหลัก: Inner Dev</string>
+    <string name="menu_saves">จัดการเซฟเกม</string>
+    <string name="button_opacity">ความโปร่งใสของปุ่ม</string>
+    <string name="tab_all">ทั้งหมด</string>
+    <string name="btn_settings">การตั้งค่า</string>
+    <string name="quick_save">เซฟด่วน</string>
+    <string name="btn_refresh">สแกนใหม่</string>
+    <string name="menu_controls">การควบคุม</string>
+    <string name="support_project">สนับสนุนโปรเจกต์ (DonationAlerts)</string>
+    <string name="search_hint">ค้นหาเกม, ภูมิภาค, โค้ด...</string>
+    <string name="btn_add_folder">เพิ่มโฟลเดอร์</string>
+    <string name="tab_favorites">รายการโปรด</string>
+    <string name="save_and_exit">บันทึกและออก</string>
+    <string name="menu_covers">จัดการปกเกม</string>
+    <string name="menu_about">เกี่ยวกับ</string>
+    <string name="smoothing">ลดรอยหยัก</string>
+    <string name="touch_controls">ปุ่มสัมผัสบนจอ</string>
+    <string name="gamepad_mapping">ตั้งค่าจอยเกม (Xbox)</string>
+    <string name="empty_library_title">คลังเกมว่างเปล่า</string>
+</resources>

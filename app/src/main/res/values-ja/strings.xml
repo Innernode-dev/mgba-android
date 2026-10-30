@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">mGBA</string>
+    <string name="tab_gba">GBA</string>
+    <string name="tab_gb">GB</string>
+    <string name="tab_gbc">GBC</string>
+    <string name="author_tester">共同発案者 兼 メインテスター: KatOriginal</string>
+    <string name="empty_library_desc">GBA、GB、またはGBCのゲームフォルダを選択してください</string>
+    <string name="open_source_notice">フォーク、改善、プルリクエストを歓迎します</string>
+    <string name="empty_library_button">ROMフォルダを選択</string>
+    <string name="screen_size">画面サイズ</string>
+    <string name="quick_load">クイックロード</string>
+    <string name="hotkeys">ホットキー</string>
+    <string name="resume_game">ゲームを再開</string>
+    <string name="screen_rotation">画面の向き</string>
+    <string name="menu_graphics">グラフィックス</string>
+    <string name="dpad_style">十字キーのスタイル</string>
+    <string name="ab_layout">A/Bボタン配置</string>
+    <string name="pause_menu">ポーズメニュー</string>
+    <string name="contact_dev">開発者に連絡</string>
+    <string name="author_lead">リード開発者: Inner Dev</string>
+    <string name="menu_saves">セーブデータ管理</string>
+    <string name="button_opacity">ボタンの透明度</string>
+    <string name="tab_all">すべて</string>
+    <string name="btn_settings">設定</string>
+    <string name="quick_save">クイックセーブ</string>
+    <string name="btn_refresh">再スキャン</string>
+    <string name="menu_controls">操作設定</string>
+    <string name="support_project">プロジェクトを支援 (DonationAlerts)</string>
+    <string name="search_hint">ゲーム、地域、コードを検索...</string>
+    <string name="btn_add_folder">フォルダを追加</string>
+    <string name="tab_favorites">お気に入り</string>
+    <string name="save_and_exit">セーブして終了</string>
+    <string name="menu_covers">カバー管理</string>
+    <string name="menu_about">アプリについて</string>
+    <string name="smoothing">スムージング</string>
+    <string name="touch_controls">オンスクリーンボタン</string>
+    <string name="gamepad_mapping">ゲームパッドの割り当て (Xbox)</string>
+    <string name="empty_library_title">ライブラリは空です</string>
+</resources>

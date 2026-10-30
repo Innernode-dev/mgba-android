@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">mGBA</string>
+    <string name="tab_all">All</string>
+    <string name="tab_gba">GBA</string>
+    <string name="tab_gb">GB</string>
+    <string name="tab_gbc">GBC</string>
+    <string name="tab_favorites">Favorites</string>
+    <string name="search_hint">Search games, regions, codes...</string>
+    <string name="btn_add_folder">Add Folder</string>
+    <string name="btn_refresh">Rescan</string>
+    <string name="btn_settings">Settings</string>
+    <string name="empty_library_title">Library is Empty</string>
+    <string name="empty_library_desc">Select a folder containing GBA, GB, or GBC games to begin playing</string>
+    <string name="empty_library_button">Select ROM Folder</string>
+    <string name="menu_graphics">Graphics</string>
+    <string name="menu_controls">Controls</string>
+    <string name="menu_saves">Saves Manager</string>
+    <string name="menu_covers">Covers Manager</string>
+    <string name="menu_about">About</string>
+    <string name="screen_size">Screen Size</string>
+    <string name="smoothing">Smoothing</string>
+    <string name="screen_rotation">Screen Orientation</string>
+    <string name="touch_controls">Touch Controls</string>
+    <string name="dpad_style">D-Pad Style</string>
+    <string name="button_opacity">Button Opacity</string>
+    <string name="ab_layout">A/B Layout</string>
+    <string name="gamepad_mapping">Gamepad Button Mapping (Xbox)</string>
+    <string name="hotkeys">Hotkeys</string>
+    <string name="quick_save">Quick Save</string>
+    <string name="quick_load">Quick Load</string>
+    <string name="pause_menu">Pause Menu</string>
+    <string name="resume_game">Resume Game</string>
+    <string name="save_and_exit">Save and Exit</string>
+    <string name="support_project">Support the Project (DonationAlerts)</string>
+    <string name="contact_dev">Contact Developer</string>
+    <string name="author_lead">Lead Developer: Inner Dev</string>
+    <string name="author_tester">Co-Author &amp; Lead QA: KatOriginal</string>
+    <string name="open_source_notice">Open for forks, issues, and pull requests</string>
+</resources>

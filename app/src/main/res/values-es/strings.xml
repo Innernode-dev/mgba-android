@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">mGBA</string>
+    <string name="tab_all">Todos</string>
+    <string name="tab_gba">GBA</string>
+    <string name="tab_gb">GB</string>
+    <string name="tab_gbc">GBC</string>
+    <string name="tab_favorites">Favoritos</string>
+    <string name="search_hint">Buscar juegos, regiones, códigos...</string>
+    <string name="btn_add_folder">Añadir carpeta</string>
+    <string name="btn_refresh">Actualizar</string>
+    <string name="btn_settings">Ajustes</string>
+    <string name="empty_library_title">La biblioteca está vacía</string>
+    <string name="empty_library_desc">Selecciona una carpeta con juegos de GBA, GB o GBC para comenzar</string>
+    <string name="empty_library_button">Seleccionar carpeta de ROMs</string>
+    <string name="menu_graphics">Gráficos</string>
+    <string name="menu_controls">Controles</string>
+    <string name="menu_saves">Gestor de partidas</string>
+    <string name="menu_covers">Gestor de portadas</string>
+    <string name="menu_about">Acerca de</string>
+    <string name="screen_size">Tamaño de pantalla</string>
+    <string name="smoothing">Suavizado</string>
+    <string name="screen_rotation">Orientación de pantalla</string>
+    <string name="touch_controls">Botones táctiles</string>
+    <string name="dpad_style">Estilo de cruceta</string>
+    <string name="button_opacity">Opacidad de botones</string>
+    <string name="ab_layout">Disposición A/B</string>
+    <string name="gamepad_mapping">Mapeo de mando (Xbox)</string>
+    <string name="hotkeys">Accesos rápidos</string>
+    <string name="quick_save">Guardado rápido</string>
+    <string name="quick_load">Carga rápida</string>
+    <string name="pause_menu">Menú de pausa</string>
+    <string name="resume_game">Continuar juego</string>
+    <string name="save_and_exit">Guardar y salir al menú</string>
+    <string name="support_project">Apoyar el proyecto (DonationAlerts)</string>
+    <string name="contact_dev">Contactar al desarrollador</string>
+    <string name="author_lead">Desarrollador principal: Inner Dev</string>
+    <string name="author_tester">Coautor &amp; Tester principal: KatOriginal</string>
+    <string name="open_source_notice">Abierto a forks, mejoras y pull requests</string>
+</resources>

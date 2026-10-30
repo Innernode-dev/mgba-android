@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">mGBA</string>
+    <string name="tab_gba">GBA</string>
+    <string name="tab_gb">GB</string>
+    <string name="tab_gbc">GBC</string>
+    <string name="author_tester">Penggagas Ide &amp; Penguji Utama: KatOriginal</string>
+    <string name="empty_library_desc">Pilih folder game GBA, GB, atau GBC untuk mulai bermain</string>
+    <string name="open_source_notice">Terbuka untuk fork, perbaikan, dan pull request</string>
+    <string name="empty_library_button">Pilih Folder ROM</string>
+    <string name="screen_size">Ukuran Layar</string>
+    <string name="quick_load">Muat Cepat</string>
+    <string name="hotkeys">Tombol Pintas</string>
+    <string name="resume_game">Lanjutkan Game</string>
+    <string name="screen_rotation">Orientasi Layar</string>
+    <string name="menu_graphics">Grafik</string>
+    <string name="dpad_style">Gaya D-Pad</string>
+    <string name="ab_layout">Tata Letak A/B</string>
+    <string name="pause_menu">Menu Jeda</string>
+    <string name="contact_dev">Hubungi Pengembang</string>
+    <string name="author_lead">Pengembang Utama: Inner Dev</string>
+    <string name="menu_saves">Manajer Simpanan</string>
+    <string name="button_opacity">Transparansi Tombol</string>
+    <string name="tab_all">Semua</string>
+    <string name="btn_settings">Pengaturan</string>
+    <string name="quick_save">Simpan Cepat</string>
+    <string name="btn_refresh">Pindai Ulang</string>
+    <string name="menu_controls">Kontrol</string>
+    <string name="support_project">Dukung Proyek (DonationAlerts)</string>
+    <string name="search_hint">Cari game, wilayah, kode...</string>
+    <string name="btn_add_folder">Tambah Folder</string>
+    <string name="tab_favorites">Favorit</string>
+    <string name="save_and_exit">Simpan dan Keluar</string>
+    <string name="menu_covers">Manajer Sampul</string>
+    <string name="menu_about">Tentang</string>
+    <string name="smoothing">Penghalusan</string>
+    <string name="touch_controls">Tombol Layar Sentuh</string>
+    <string name="gamepad_mapping">Pemetaan Tombol Gamepad (Xbox)</string>
+    <string name="empty_library_title">Koleksi Kosong</string>
+</resources>

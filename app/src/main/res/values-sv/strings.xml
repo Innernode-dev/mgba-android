@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">mGBA</string>
+    <string name="tab_gba">GBA</string>
+    <string name="tab_gb">GB</string>
+    <string name="tab_gbc">GBC</string>
+    <string name="author_tester">Medskapare &amp; Huvudtestare: KatOriginal</string>
+    <string name="empty_library_desc">Välj en mapp med GBA-, GB- eller GBC-spel för att börja</string>
+    <string name="open_source_notice">Öppet för forks, förbättringar och pull requests</string>
+    <string name="empty_library_button">Välj ROM-mapp</string>
+    <string name="screen_size">Skärmstorlek</string>
+    <string name="quick_load">Snabbladda</string>
+    <string name="hotkeys">Snabbknappar</string>
+    <string name="resume_game">Återuppta spel</string>
+    <string name="screen_rotation">Skärmorientering</string>
+    <string name="menu_graphics">Grafik</string>
+    <string name="dpad_style">Styrkors-stil</string>
+    <string name="ab_layout">A/B-layout</string>
+    <string name="pause_menu">Pausmeny</string>
+    <string name="contact_dev">Kontakta utvecklaren</string>
+    <string name="author_lead">Huvudutvecklare: Inner Dev</string>
+    <string name="menu_saves">Spara-hanterare</string>
+    <string name="button_opacity">Knappgenomskinlighet</string>
+    <string name="tab_all">Alla</string>
+    <string name="btn_settings">Inställningar</string>
+    <string name="quick_save">Snabbsspara</string>
+    <string name="btn_refresh">Uppdatera</string>
+    <string name="menu_controls">Styrning</string>
+    <string name="support_project">Stöd projektet (DonationAlerts)</string>
+    <string name="search_hint">Sök spel, regioner, koder...</string>
+    <string name="btn_add_folder">Lägg till mapp</string>
+    <string name="tab_favorites">Favoriter</string>
+    <string name="save_and_exit">Spara och avsluta</string>
+    <string name="menu_covers">Omslagshanterare</string>
+    <string name="menu_about">Om appen</string>
+    <string name="smoothing">Utjämning</string>
+    <string name="touch_controls">Skärmknappar</string>
+    <string name="gamepad_mapping">Handkontrollmappning (Xbox)</string>
+    <string name="empty_library_title">Biblioteket är tomt</string>
+</resources>

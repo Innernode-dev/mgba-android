@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">mGBA</string>
+    <string name="tab_gba">GBA</string>
+    <string name="tab_gb">GB</string>
+    <string name="tab_gbc">GBC</string>
+    <string name="author_tester">创意共创 &amp; 首席测试: KatOriginal</string>
+    <string name="empty_library_desc">请选择包含 GBA、GB 或 GBC 游戏的文件夹开始游玩</string>
+    <string name="open_source_notice">欢迎 Fork、改进与 Pull Request</string>
+    <string name="empty_library_button">选择 ROM 文件夹</string>
+    <string name="screen_size">屏幕尺寸</string>
+    <string name="quick_load">即时读档</string>
+    <string name="hotkeys">快捷键</string>
+    <string name="resume_game">继续游戏</string>
+    <string name="screen_rotation">屏幕方向</string>
+    <string name="menu_graphics">图像</string>
+    <string name="dpad_style">十字键样式</string>
+    <string name="ab_layout">A/B 按键布局</string>
+    <string name="pause_menu">暂停菜单</string>
+    <string name="contact_dev">联系开发者</string>
+    <string name="author_lead">主要开发者: Inner Dev</string>
+    <string name="menu_saves">存档管理器</string>
+    <string name="button_opacity">按键透明度</string>
+    <string name="tab_all">全部</string>
+    <string name="btn_settings">设置</string>
+    <string name="quick_save">即时存档</string>
+    <string name="btn_refresh">刷新</string>
+    <string name="menu_controls">控制</string>
+    <string name="support_project">支持项目 (DonationAlerts)</string>
+    <string name="search_hint">搜索游戏、地区、代码...</string>
+    <string name="btn_add_folder">添加文件夹</string>
+    <string name="tab_favorites">收藏</string>
+    <string name="save_and_exit">保存并退出到主菜单</string>
+    <string name="menu_covers">封面管理器</string>
+    <string name="menu_about">关于应用</string>
+    <string name="smoothing">平滑滤镜</string>
+    <string name="touch_controls">虚拟按键</string>
+    <string name="gamepad_mapping">手柄键位映射 (Xbox)</string>
+    <string name="empty_library_title">游戏库为空</string>
+</resources>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">mGBA</string>
+    <string name="tab_gba">GBA</string>
+    <string name="tab_gb">GB</string>
+    <string name="tab_gbc">GBC</string>
+    <string name="author_tester">Mede-bedenker &amp; Hoofdtester: KatOriginal</string>
+    <string name="empty_library_desc">Kies een map met GBA-, GB- of GBC-spellen om te beginnen</string>
+    <string name="open_source_notice">Open voor forks, verbeteringen en pull requests</string>
+    <string name="empty_library_button">Selecteer ROM-map</string>
+    <string name="screen_size">Schermgrootte</string>
+    <string name="quick_load">Snel laden</string>
+    <string name="hotkeys">Sneltoetsen</string>
+    <string name="resume_game">Spel hervatten</string>
+    <string name="screen_rotation">Schermoriëntatie</string>
+    <string name="menu_graphics">Grafisch</string>
+    <string name="dpad_style">D-Pad stijl</string>
+    <string name="ab_layout">A/B-indeling</string>
+    <string name="pause_menu">Pauzemenu</string>
+    <string name="contact_dev">Contacteer ontwikkelaar</string>
+    <string name="author_lead">Hoofdontwikkelaar: Inner Dev</string>
+    <string name="menu_saves">Opslagbeheer</string>
+    <string name="button_opacity">Transparantie knoppen</string>
+    <string name="tab_all">Alle</string>
+    <string name="btn_settings">Instellingen</string>
+    <string name="quick_save">Snel opslaan</string>
+    <string name="btn_refresh">Vernieuwen</string>
+    <string name="menu_controls">Besturing</string>
+    <string name="support_project">Ondersteun het project (DonationAlerts)</string>
+    <string name="search_hint">Zoek spellen, regio\'s, codes...</string>
+    <string name="btn_add_folder">Map toevoegen</string>
+    <string name="tab_favorites">Favorieten</string>
+    <string name="save_and_exit">Opslaan en afsluiten</string>
+    <string name="menu_covers">Hoesjesbeheer</string>
+    <string name="menu_about">Over de app</string>
+    <string name="smoothing">Verzachten</string>
+    <string name="touch_controls">Schermknoppen</string>
+    <string name="gamepad_mapping">Gamepad-toewijzing (Xbox)</string>
+    <string name="empty_library_title">Bibliotheek is leeg</string>
+</resources>

@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">mGBA</string>
+    <string name="tab_gba">GBA</string>
+    <string name="tab_gb">GB</string>
+    <string name="tab_gbc">GBC</string>
+    <string name="author_tester">Συν-δημιουργός &amp; Επικεφαλής δοκιμών: KatOriginal</string>
+    <string name="empty_library_desc">Επιλέξτε έναν φάκελο με παιχνίδια GBA, GB ή GBC</string>
+    <string name="open_source_notice">Ανοιχτό σε forks, βελτιώσεις και pull requests</string>
+    <string name="empty_library_button">Επιλογή φακέλου ROM</string>
+    <string name="screen_size">Μέγεθος οθόνης</string>
+    <string name="quick_load">Γρήγορη φόρτωση</string>
+    <string name="hotkeys">Συντομεύσεις</string>
+    <string name="resume_game">Συνέχεια παιχνιδιού</string>
+    <string name="screen_rotation">Προσανατολισμός οθόνης</string>
+    <string name="menu_graphics">Γραφικά</string>
+    <string name="dpad_style">Στυλ D-Pad</string>
+    <string name="ab_layout">Διάταξη A/B</string>
+    <string name="pause_menu">Μενού παύσης</string>
+    <string name="contact_dev">Επικοινωνία με προγραμματιστή</string>
+    <string name="author_lead">Κύριος προγραμματιστής: Inner Dev</string>
+    <string name="menu_saves">Διαχείριση αποθηκεύσεων</string>
+    <string name="button_opacity">Διαφάνεια κουμπιών</string>
+    <string name="tab_all">Όλα</string>
+    <string name="btn_settings">Ρυθμίσεις</string>
+    <string name="quick_save">Γρήγορη αποθήκευση</string>
+    <string name="btn_refresh">Ανανέωση</string>
+    <string name="menu_controls">Χειριστήριο</string>
+    <string name="support_project">Υποστήριξη έργου (DonationAlerts)</string>
+    <string name="search_hint">Αναζήτηση παιχνιδιών, περιοχών, κωδικών...</string>
+    <string name="btn_add_folder">Προσθήκη φακέλου</string>
+    <string name="tab_favorites">Αγαπημένα</string>
+    <string name="save_and_exit">Αποθήκευση και έξοδος</string>
+    <string name="menu_covers">Διαχείριση εξωφύλλων</string>
+    <string name="menu_about">Σχετικά</string>
+    <string name="smoothing">Εξομάλυνση</string>
+    <string name="touch_controls">Κουμπιά αφής</string>
+    <string name="gamepad_mapping">Αντιστοίχιση χειριστηρίου (Xbox)</string>
+    <string name="empty_library_title">Η βιβλιοθήκη είναι κενή</string>
+</resources>

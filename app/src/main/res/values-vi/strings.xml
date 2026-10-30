@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">mGBA</string>
+    <string name="tab_gba">GBA</string>
+    <string name="tab_gb">GB</string>
+    <string name="tab_gbc">GBC</string>
+    <string name="author_tester">Đồng tác giả &amp; Trưởng nhóm kiểm thử: KatOriginal</string>
+    <string name="empty_library_desc">Chọn thư mục chứa trò chơi GBA, GB hoặc GBC để bắt đầu</string>
+    <string name="open_source_notice">Chào đón fork, đóng góp và pull request</string>
+    <string name="empty_library_button">Chọn thư mục ROM</string>
+    <string name="screen_size">Kích thước màn hình</string>
+    <string name="quick_load">Tải nhanh</string>
+    <string name="hotkeys">Phím tắt</string>
+    <string name="resume_game">Tiếp tục chơi</string>
+    <string name="screen_rotation">Xoay màn hình</string>
+    <string name="menu_graphics">Đồ họa</string>
+    <string name="dpad_style">Kiểu phím điều hướng</string>
+    <string name="ab_layout">Bố cục nút A/B</string>
+    <string name="pause_menu">Menu tạm dừng</string>
+    <string name="contact_dev">Liên hệ nhà phát triển</string>
+    <string name="author_lead">Nhà phát triển chính: Inner Dev</string>
+    <string name="menu_saves">Quản lý lưu game</string>
+    <string name="button_opacity">Độ trong suốt của nút</string>
+    <string name="tab_all">Tất cả</string>
+    <string name="btn_settings">Cài đặt</string>
+    <string name="quick_save">Lưu nhanh</string>
+    <string name="btn_refresh">Quét lại</string>
+    <string name="menu_controls">Điều khiển</string>
+    <string name="support_project">Ủng hộ dự án (DonationAlerts)</string>
+    <string name="search_hint">Tìm kiếm trò chơi, khu vực, mã...</string>
+    <string name="btn_add_folder">Thêm thư mục</string>
+    <string name="tab_favorites">Yêu thích</string>
+    <string name="save_and_exit">Lưu và thoát</string>
+    <string name="menu_covers">Quản lý ảnh bìa</string>
+    <string name="menu_about">Giới thiệu</string>
+    <string name="smoothing">Làm mịn</string>
+    <string name="touch_controls">Nút ảo trên màn hình</string>
+    <string name="gamepad_mapping">Gán nút tay cầm (Xbox)</string>
+    <string name="empty_library_title">Thư viện trống</string>
+</resources>

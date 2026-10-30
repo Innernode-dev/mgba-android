@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">mGBA</string>
+    <string name="tab_gba">GBA</string>
+    <string name="tab_gb">GB</string>
+    <string name="tab_gbc">GBC</string>
+    <string name="author_tester">Co-auteur &amp; Testeur principal : KatOriginal</string>
+    <string name="empty_library_desc">Sélectionnez un dossier contenant des jeux GBA, GB ou GBC</string>
+    <string name="open_source_notice">Ouvert aux forks, améliorations et pull requests</string>
+    <string name="empty_library_button">Choisir le dossier des ROMs</string>
+    <string name="screen_size">Taille de l\'écran</string>
+    <string name="quick_load">Chargement rapide</string>
+    <string name="hotkeys">Raccourcis</string>
+    <string name="resume_game">Reprendre la partie</string>
+    <string name="screen_rotation">Orientation de l\'écran</string>
+    <string name="menu_graphics">Graphismes</string>
+    <string name="dpad_style">Style de croix directionnelle</string>
+    <string name="ab_layout">Disposition A/B</string>
+    <string name="pause_menu">Menu pause</string>
+    <string name="contact_dev">Contacter le développeur</string>
+    <string name="author_lead">Développeur principal : Inner Dev</string>
+    <string name="menu_saves">Gestionnaire de sauvegardes</string>
+    <string name="button_opacity">Opacité des boutons</string>
+    <string name="tab_all">Tous</string>
+    <string name="btn_settings">Paramètres</string>
+    <string name="quick_save">Sauvegarde rapide</string>
+    <string name="btn_refresh">Actualiser</string>
+    <string name="menu_controls">Commandes</string>
+    <string name="support_project">Soutenir le projet (DonationAlerts)</string>
+    <string name="search_hint">Rechercher des jeux, régions, codes...</string>
+    <string name="btn_add_folder">Ajouter un dossier</string>
+    <string name="tab_favorites">Favoris</string>
+    <string name="save_and_exit">Sauvegarder et quitter</string>
+    <string name="menu_covers">Gestionnaire de jaquettes</string>
+    <string name="menu_about">À propos</string>
+    <string name="smoothing">Lissage</string>
+    <string name="touch_controls">Boutons à l\'écran</string>
+    <string name="gamepad_mapping">Mappage de la manette (Xbox)</string>
+    <string name="empty_library_title">La bibliothèque est vide</string>
+</resources>
+

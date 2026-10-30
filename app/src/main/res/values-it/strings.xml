@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">mGBA</string>
+    <string name="tab_gba">GBA</string>
+    <string name="tab_gb">GB</string>
+    <string name="tab_gbc">GBC</string>
+    <string name="author_tester">Co-autore &amp; Tester: KatOriginal</string>
+    <string name="empty_library_desc">Seleziona una cartella con giochi GBA, GB o GBC</string>
+    <string name="open_source_notice">Aperto a fork, miglioramenti e pull request</string>
+    <string name="empty_library_button">Seleziona cartella ROM</string>
+    <string name="screen_size">Dimensioni schermo</string>
+    <string name="quick_load">Caricamento rapido</string>
+    <string name="hotkeys">Tasti rapidi</string>
+    <string name="resume_game">Riprendi gioco</string>
+    <string name="screen_rotation">Orientamento schermo</string>
+    <string name="menu_graphics">Grafica</string>
+    <string name="dpad_style">Stile D-Pad</string>
+    <string name="ab_layout">Disposizione A/B</string>
+    <string name="pause_menu">Menu di pausa</string>
+    <string name="contact_dev">Contatta sviluppatore</string>
+    <string name="author_lead">Sviluppatore principale: Inner Dev</string>
+    <string name="menu_saves">Gestore salvataggi</string>
+    <string name="button_opacity">Opacità pulsanti</string>
+    <string name="tab_all">Tutti</string>
+    <string name="btn_settings">Impostazioni</string>
+    <string name="quick_save">Salvataggio rapido</string>
+    <string name="btn_refresh">Aggiorna</string>
+    <string name="menu_controls">Controlli</string>
+    <string name="support_project">Supporta il progetto (DonationAlerts)</string>
+    <string name="search_hint">Cerca giochi, regioni, codici...</string>
+    <string name="btn_add_folder">Aggiungi cartella</string>
+    <string name="tab_favorites">Preferiti</string>
+    <string name="save_and_exit">Salva ed esci</string>
+    <string name="menu_covers">Gestore copertine</string>
+    <string name="menu_about">Info</string>
+    <string name="smoothing">Smussamento</string>
+    <string name="touch_controls">Pulsanti su schermo</string>
+    <string name="gamepad_mapping">Mappatura controller (Xbox)</string>
+    <string name="empty_library_title">La libreria è vuota</string>
+</resources>
+

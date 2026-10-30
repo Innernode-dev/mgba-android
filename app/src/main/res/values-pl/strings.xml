@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">mGBA</string>
+    <string name="tab_gba">GBA</string>
+    <string name="tab_gb">GB</string>
+    <string name="tab_gbc">GBC</string>
+    <string name="author_tester">Współautor i główny tester: KatOriginal</string>
+    <string name="empty_library_desc">Wybierz folder z grami GBA, GB lub GBC</string>
+    <string name="open_source_notice">Otwarte na forki, poprawki i pull requesty</string>
+    <string name="empty_library_button">Wybierz folder ROM</string>
+    <string name="screen_size">Rozmiar ekranu</string>
+    <string name="quick_load">Szybkie wczytanie</string>
+    <string name="hotkeys">Skróty klawiszowe</string>
+    <string name="resume_game">Wznów grę</string>
+    <string name="screen_rotation">Orientacja ekranu</string>
+    <string name="menu_graphics">Grafika</string>
+    <string name="dpad_style">Styl D-Pad</string>
+    <string name="ab_layout">Układ A/B</string>
+    <string name="pause_menu">Menu pauzy</string>
+    <string name="contact_dev">Kontakt z twórcą</string>
+    <string name="author_lead">Główny deweloper: Inner Dev</string>
+    <string name="menu_saves">Menedżer zapisów</string>
+    <string name="button_opacity">Przezroczystość</string>
+    <string name="tab_all">Wszystkie</string>
+    <string name="btn_settings">Ustawienia</string>
+    <string name="quick_save">Szybki zapis</string>
+    <string name="btn_refresh">Odśwież</string>
+    <string name="menu_controls">Sterowanie</string>
+    <string name="support_project">Wesprzyj projekt (DonationAlerts)</string>
+    <string name="search_hint">Szukaj gier, regionów, kodów...</string>
+    <string name="btn_add_folder">Dodaj folder</string>
+    <string name="tab_favorites">Ulubione</string>
+    <string name="save_and_exit">Zapisz i wyjdź</string>
+    <string name="menu_covers">Menedżer okładek</string>
+    <string name="menu_about">O aplikacji</string>
+    <string name="smoothing">Wygładzanie</string>
+    <string name="touch_controls">Przyciski ekranowe</string>
+    <string name="gamepad_mapping">Mapowanie kontrolera (Xbox)</string>
+    <string name="empty_library_title">Biblioteka jest pusta</string>
+</resources>

@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">mGBA</string>
+    <string name="tab_gba">GBA</string>
+    <string name="tab_gb">GB</string>
+    <string name="tab_gbc">GBC</string>
+    <string name="author_tester">Spoluautor &amp; Hlavní tester: KatOriginal</string>
+    <string name="empty_library_desc">Vyberte složku s hrami GBA, GB nebo GBC pro zahájení hraní</string>
+    <string name="open_source_notice">Otevřeno pro forky, vylepšení a pull requesty</string>
+    <string name="empty_library_button">Vybrat složku ROM</string>
+    <string name="screen_size">Velikost obrazovky</string>
+    <string name="quick_load">Rychlé načtení</string>
+    <string name="hotkeys">Klávesové zkratky</string>
+    <string name="resume_game">Pokračovat ve hře</string>
+    <string name="screen_rotation">Orientace obrazovky</string>
+    <string name="menu_graphics">Grafika</string>
+    <string name="dpad_style">Styl D-Padu</string>
+    <string name="ab_layout">Rozložení A/B</string>
+    <string name="pause_menu">Nabídka pozastavení</string>
+    <string name="contact_dev">Kontaktovat vývojáře</string>
+    <string name="author_lead">Hlavní vývojář: Inner Dev</string>
+    <string name="menu_saves">Správce uložených pozic</string>
+    <string name="button_opacity">Průhlednost tlačítek</string>
+    <string name="tab_all">Vše</string>
+    <string name="btn_settings">Nastavení</string>
+    <string name="quick_save">Rychlé uložení</string>
+    <string name="btn_refresh">Znovu načíst</string>
+    <string name="menu_controls">Ovládání</string>
+    <string name="support_project">Podpořit projekt (DonationAlerts)</string>
+    <string name="search_hint">Hledat hry, regiony, kódy...</string>
+    <string name="btn_add_folder">Přidat složku</string>
+    <string name="tab_favorites">Oblíbené</string>
+    <string name="save_and_exit">Uložit a ukončit</string>
+    <string name="menu_covers">Správce obalů</string>
+    <string name="menu_about">O aplikaci</string>
+    <string name="smoothing">Vyhlazování</string>
+    <string name="touch_controls">Dotyková tlačítka</string>
+    <string name="gamepad_mapping">Mapování gamepadu (Xbox)</string>
+    <string name="empty_library_title">Knihovna je prázdná</string>
+</resources>
