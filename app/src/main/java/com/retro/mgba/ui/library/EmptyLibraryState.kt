@@ -25,10 +25,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.retro.mgba.R
 import com.retro.mgba.ui.navigation.handheldFocusable
 import com.retro.mgba.ui.theme.AccentPrimary
 import com.retro.mgba.ui.theme.GbaPurple
@@ -71,7 +73,7 @@ fun EmptyLibraryState(
         Spacer(modifier = Modifier.height(20.dp))
 
         Text(
-            text = "Библиотека игр пуста",
+            text = stringResource(R.string.empty_library_title),
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
             color = TextPrimary,
@@ -81,7 +83,7 @@ fun EmptyLibraryState(
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "Выберите папку с вашими ROM-играми Game Boy Advance (.gba), Game Boy (.gb) или Game Boy Color (.gbc), чтобы отобразить их плитками с обложками.",
+            text = stringResource(R.string.empty_library_desc),
             style = MaterialTheme.typography.bodyMedium,
             color = TextSecondary,
             textAlign = TextAlign.Center,
@@ -109,7 +111,7 @@ fun EmptyLibraryState(
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = "Выбрать папку с играми",
+                text = stringResource(R.string.empty_library_button),
                 fontWeight = FontWeight.Bold,
                 fontSize = 14.sp
             )

@@ -18,6 +18,7 @@
     <string name="menu_saves">Saves Manager</string>
     <string name="menu_covers">Covers Manager</string>
     <string name="menu_about">About</string>
+    <string name="app_language">App Language</string>
     <string name="screen_size">Screen Size</string>
     <string name="smoothing">Smoothing</string>
     <string name="screen_rotation">Screen Orientation</string>

@@ -1,5 +1,6 @@
 package com.retro.mgba
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -33,6 +34,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -46,6 +48,7 @@ import com.retro.mgba.data.storage.StorageHelper
 import com.retro.mgba.overlay.TouchOverlayView
 import com.retro.mgba.ui.library.CartridgeCanvas
 import com.retro.mgba.ui.theme.*
+import com.retro.mgba.util.LocaleHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -116,6 +119,10 @@ class SettingsActivity : ComponentActivity() {
             KeyEvent.KEYCODE_DPAD_RIGHT -> "D-Pad Вправо"
             else -> KeyEvent.keyCodeToString(keyCode).removePrefix("KEYCODE_")
         }
+    }
+
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(com.retro.mgba.util.LocaleHelper.applyLocale(newBase))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -200,12 +207,12 @@ fun NestedSettingsScreen(
     }
 
     val topBarTitle = when (currentSubMenu) {
-        SettingsSubMenu.MAIN -> "Настройки"
-        SettingsSubMenu.GRAPHICS -> "Графика"
-        SettingsSubMenu.CONTROLS -> "Управление"
-        SettingsSubMenu.SAVES_MANAGER -> "Менеджер сохранений"
-        SettingsSubMenu.COVERS_MANAGER -> "Менеджер обложек"
-        SettingsSubMenu.ABOUT -> "О приложении"
+        SettingsSubMenu.MAIN -> stringResource(R.string.btn_settings)
+        SettingsSubMenu.GRAPHICS -> stringResource(R.string.menu_graphics)
+        SettingsSubMenu.CONTROLS -> stringResource(R.string.menu_controls)
+        SettingsSubMenu.SAVES_MANAGER -> stringResource(R.string.menu_saves)
+        SettingsSubMenu.COVERS_MANAGER -> stringResource(R.string.menu_covers)
+        SettingsSubMenu.ABOUT -> stringResource(R.string.menu_about)
     }
 
     Scaffold(
@@ -281,6 +288,9 @@ fun NestedSettingsScreen(
 
 @Composable
 fun MainSettingsMenu(onNavigate: (SettingsSubMenu) -> Unit) {
+    val context = LocalContext.current
+    var showLanguageDialog by remember { mutableStateOf(false) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -294,41 +304,67 @@ fun MainSettingsMenu(onNavigate: (SettingsSubMenu) -> Unit) {
         ) {
             Column {
                 SettingsNavigationRow(
-                    title = "Графика",
-                    subtitle = "Размер экрана, сглаживание, поворот",
+                    title = stringResource(R.string.menu_graphics),
+                    subtitle = stringResource(R.string.screen_size) + ", " + stringResource(R.string.smoothing),
                     icon = Icons.Filled.Tv,
                     onClick = { onNavigate(SettingsSubMenu.GRAPHICS) }
                 )
                 HorizontalDivider(color = SurfaceBorderSubtle)
                 SettingsNavigationRow(
-                    title = "Управление",
-                    subtitle = "Экранные кнопки, стик, геймпад, горячие клавиши",
+                    title = stringResource(R.string.menu_controls),
+                    subtitle = stringResource(R.string.touch_controls) + ", " + stringResource(R.string.gamepad_mapping),
                     icon = Icons.Filled.SportsEsports,
                     onClick = { onNavigate(SettingsSubMenu.CONTROLS) }
                 )
                 HorizontalDivider(color = SurfaceBorderSubtle)
                 SettingsNavigationRow(
-                    title = "Менеджер сохранений",
-                    subtitle = "Импорт, экспорт и удаление сохранений (.sav, .ss)",
+                    title = stringResource(R.string.menu_saves),
+                    subtitle = "Импорт, экспорт (.sav, .ss)",
                     icon = Icons.Filled.FolderSpecial,
                     onClick = { onNavigate(SettingsSubMenu.SAVES_MANAGER) }
                 )
                 HorizontalDivider(color = SurfaceBorderSubtle)
                 SettingsNavigationRow(
-                    title = "Менеджер обложек",
-                    subtitle = "Просмотр, загрузка и удаление обложек игр",
+                    title = stringResource(R.string.menu_covers),
+                    subtitle = "Кастомные обложки картриджей",
                     icon = Icons.Filled.Image,
                     onClick = { onNavigate(SettingsSubMenu.COVERS_MANAGER) }
                 )
                 HorizontalDivider(color = SurfaceBorderSubtle)
                 SettingsNavigationRow(
-                    title = "О приложении",
-                    subtitle = "Версия ядра mGBA 0.10.5, лицензии",
+                    title = stringResource(R.string.app_language),
+                    subtitle = LocaleHelper.getLanguageDisplayLabel(context),
+                    icon = Icons.Filled.Language,
+                    onClick = { showLanguageDialog = true }
+                )
+                HorizontalDivider(color = SurfaceBorderSubtle)
+                SettingsNavigationRow(
+                    title = stringResource(R.string.menu_about),
+                    subtitle = "mGBA 0.10.5, Inner Dev & KatOriginal",
                     icon = Icons.Filled.Info,
                     onClick = { onNavigate(SettingsSubMenu.ABOUT) }
                 )
             }
         }
+    }
+
+    if (showLanguageDialog) {
+        val options = LocaleHelper.SUPPORTED_LANGUAGES.map { it.second }
+        val currentCode = LocaleHelper.getSelectedLanguage(context)
+        val selectedIndex = LocaleHelper.SUPPORTED_LANGUAGES.indexOfFirst { it.first == currentCode }.coerceAtLeast(0)
+
+        SingleChoiceDialog(
+            title = stringResource(R.string.app_language),
+            options = options,
+            selectedIndex = selectedIndex,
+            onSelect = { index ->
+                val targetCode = LocaleHelper.SUPPORTED_LANGUAGES[index].first
+                LocaleHelper.setLanguage(context, targetCode)
+                showLanguageDialog = false
+                (context as? Activity)?.recreate()
+            },
+            onDismiss = { showLanguageDialog = false }
+        )
     }
 }
 

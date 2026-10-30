@@ -21,9 +21,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.retro.mgba.R
 import com.retro.mgba.ui.navigation.handheldFocusable
 import com.retro.mgba.ui.theme.AccentPrimary
 import com.retro.mgba.ui.theme.FavoriteGold
@@ -108,8 +110,16 @@ fun FilterChipsRow(
                             }
                         }
 
+                        val chipLabel = when (filter) {
+                            GameFilter.ALL -> stringResource(R.string.tab_all)
+                            GameFilter.GBA -> stringResource(R.string.tab_gba)
+                            GameFilter.GB -> stringResource(R.string.tab_gb)
+                            GameFilter.GBC -> stringResource(R.string.tab_gbc)
+                            GameFilter.FAVORITES -> stringResource(R.string.tab_favorites)
+                        }
+
                         Text(
-                            text = filter.label,
+                            text = chipLabel,
                             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
                             fontSize = 12.sp
                         )

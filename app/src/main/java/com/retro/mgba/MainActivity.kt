@@ -22,6 +22,21 @@ import com.retro.mgba.ui.theme.RetroMgbaTheme
  */
 class MainActivity : ComponentActivity() {
 
+    override fun attachBaseContext(newBase: android.content.Context) {
+        super.attachBaseContext(com.retro.mgba.util.LocaleHelper.applyLocale(newBase))
+    }
+
+    private var currentLanguage = ""
+
+    override fun onResume() {
+        super.onResume()
+        val lang = com.retro.mgba.util.LocaleHelper.getSelectedLanguage(this)
+        if (currentLanguage.isNotEmpty() && currentLanguage != lang) {
+            recreate()
+        }
+        currentLanguage = lang
+    }
+
     private val viewModel: LibraryViewModel by viewModels {
         val db = AppDatabase.getInstance(applicationContext)
         val gameRepo = GameRepository(db.gameDao())

@@ -44,6 +44,10 @@ import kotlin.concurrent.thread
  */
 class EmulationActivity : ComponentActivity(), SurfaceHolder.Callback {
 
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(com.retro.mgba.util.LocaleHelper.applyLocale(newBase))
+    }
+
     private val core = NativeCore()
     private var emulationThread: Thread? = null
     @Volatile private var running = false

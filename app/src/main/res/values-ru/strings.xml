@@ -18,6 +18,7 @@
     <string name="menu_saves">Менеджер сохранений</string>
     <string name="menu_covers">Менеджер обложек</string>
     <string name="menu_about">О приложении</string>
+    <string name="app_language">Язык приложения</string>
     <string name="screen_size">Размер экрана</string>
     <string name="smoothing">Сглаживание</string>
     <string name="screen_rotation">Поворот экрана</string>

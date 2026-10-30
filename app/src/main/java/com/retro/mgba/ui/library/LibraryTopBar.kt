@@ -43,10 +43,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.retro.mgba.R
 import com.retro.mgba.ui.navigation.handheldFocusable
 import com.retro.mgba.ui.theme.AccentPrimary
 import com.retro.mgba.ui.theme.OledBackground
@@ -131,7 +133,7 @@ fun LibraryTopBar(
                 ) {
                     Icon(
                         imageVector = Icons.Filled.CreateNewFolder,
-                        contentDescription = "Добавить папку",
+                        contentDescription = stringResource(R.string.btn_add_folder),
                         tint = AccentPrimary,
                         modifier = Modifier.size(20.dp)
                     )
@@ -146,7 +148,7 @@ fun LibraryTopBar(
                 ) {
                     Icon(
                         imageVector = Icons.Filled.Sync,
-                        contentDescription = "Обновить папки",
+                        contentDescription = stringResource(R.string.btn_refresh),
                         tint = TextSecondary,
                         modifier = Modifier.size(20.dp)
                     )
@@ -214,7 +216,7 @@ fun LibraryTopBar(
                 ) {
                     Icon(
                         imageVector = Icons.Filled.Settings,
-                        contentDescription = "Настройки",
+                        contentDescription = stringResource(R.string.btn_settings),
                         tint = TextSecondary,
                         modifier = Modifier.size(20.dp)
                     )
@@ -230,7 +232,7 @@ fun LibraryTopBar(
             onValueChange = onSearchQueryChange,
             placeholder = {
                 Text(
-                    text = "Поиск игр, регионов, кодов...",
+                    text = stringResource(R.string.search_hint),
                     color = TextMuted,
                     fontSize = 13.sp
                 )
