@@ -28,9 +28,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.retro.mgba.R
 import com.retro.mgba.scanner.ScanProgress
 import com.retro.mgba.ui.theme.AccentPrimary
 import com.retro.mgba.ui.theme.SurfaceElevated
@@ -93,7 +95,7 @@ fun ScanFeedbackBar(
                             .rotate(rotation)
                     )
                     Text(
-                        text = "Сканирование: $dirName...",
+                        text = stringResource(R.string.scan_scanning_dir, dirName),
                         fontSize = 13.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = TextPrimary
@@ -101,7 +103,7 @@ fun ScanFeedbackBar(
                 }
 
                 Text(
-                    text = "Найдено: $count",
+                    text = stringResource(R.string.scan_found_count, count),
                     fontSize = 12.sp,
                     color = AccentPrimary,
                     fontWeight = FontWeight.Bold

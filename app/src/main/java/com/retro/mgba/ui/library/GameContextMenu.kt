@@ -27,8 +27,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.retro.mgba.R
 import com.retro.mgba.data.db.GameEntity
 import com.retro.mgba.ui.theme.AccentPrimary
 import com.retro.mgba.ui.theme.DestructiveRed
@@ -64,7 +66,7 @@ fun GameContextMenu(
     ) {
         // Play / Resume
         DropdownMenuItem(
-            text = { Text("Играть", color = TextPrimary, fontWeight = FontWeight.Medium) },
+            text = { Text(stringResource(R.string.action_play), color = TextPrimary, fontWeight = FontWeight.Medium) },
             leadingIcon = {
                 Icon(Icons.Filled.PlayArrow, contentDescription = null, tint = AccentPrimary)
             },
@@ -78,7 +80,7 @@ fun GameContextMenu(
         DropdownMenuItem(
             text = {
                 Text(
-                    text = if (game.isFavorite) "Убрать из избранного" else "В избранное",
+                    text = if (game.isFavorite) stringResource(R.string.action_remove_favorite) else stringResource(R.string.action_add_favorite),
                     color = TextPrimary
                 )
             },
@@ -99,7 +101,7 @@ fun GameContextMenu(
         DropdownMenuItem(
             text = {
                 Text(
-                    text = if (game.customCoverUri != null) "Сменить обложку" else "Обложка из галереи",
+                    text = if (game.customCoverUri != null) stringResource(R.string.action_change_cover) else stringResource(R.string.action_choose_cover),
                     color = TextPrimary
                 )
             },
@@ -115,7 +117,7 @@ fun GameContextMenu(
         // Reset Custom Box Art if assigned
         if (game.customCoverUri != null) {
             DropdownMenuItem(
-                text = { Text("Сбросить обложку", color = TextSecondary) },
+                text = { Text(stringResource(R.string.action_reset_cover), color = TextSecondary) },
                 leadingIcon = {
                     Icon(Icons.Filled.DeleteOutline, contentDescription = null, tint = TextMuted)
                 },
@@ -128,7 +130,7 @@ fun GameContextMenu(
 
         // Game Details
         DropdownMenuItem(
-            text = { Text("Подробности", color = TextPrimary) },
+            text = { Text(stringResource(R.string.action_details), color = TextPrimary) },
             leadingIcon = {
                 Icon(Icons.Filled.Info, contentDescription = null, tint = TextSecondary)
             },
@@ -142,7 +144,7 @@ fun GameContextMenu(
 
         // Remove from Library
         DropdownMenuItem(
-            text = { Text("Удалить из библиотеки", color = DestructiveRed) },
+            text = { Text(stringResource(R.string.action_remove_from_library), color = DestructiveRed) },
             leadingIcon = {
                 Icon(Icons.Filled.DeleteOutline, contentDescription = null, tint = DestructiveRed)
             },
@@ -177,22 +179,22 @@ fun GameDetailsDialog(
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                DetailRow("System", game.system)
-                DetailRow("Region", game.region)
+                DetailRow(stringResource(R.string.details_system), game.system)
+                DetailRow(stringResource(R.string.details_region), game.region)
                 if (game.gameCode != null) {
-                    DetailRow("Game Code", game.gameCode)
+                    DetailRow(stringResource(R.string.details_game_code), game.gameCode)
                 }
-                DetailRow("File Size", game.formattedFileSize)
-                DetailRow("Last Played", game.formattedLastPlayed)
-                DetailRow("Total Playtime", game.formattedPlayTime)
-                DetailRow("SRAM Save", if (game.sramPath != null) "Detected" else "None")
+                DetailRow(stringResource(R.string.details_file_size), game.formattedFileSize)
+                DetailRow(stringResource(R.string.details_last_played), game.formattedLastPlayed)
+                DetailRow(stringResource(R.string.details_playtime), game.formattedPlayTime)
+                DetailRow(stringResource(R.string.details_sram_save), if (game.sramPath != null) stringResource(R.string.detected) else stringResource(R.string.none))
                 Spacer(modifier = Modifier.height(4.dp))
-                DetailRow("Storage URI", game.uri, isMonospace = true)
+                DetailRow(stringResource(R.string.details_storage_uri), game.uri, isMonospace = true)
             }
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text("Закрыть", color = AccentPrimary)
+                Text(stringResource(R.string.close), color = AccentPrimary)
             }
         }
     )

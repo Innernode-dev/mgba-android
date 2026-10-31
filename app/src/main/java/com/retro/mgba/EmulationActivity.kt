@@ -189,7 +189,7 @@ class EmulationActivity : ComponentActivity(), SurfaceHolder.Callback {
         }
 
         if (!core.create(48000, 2048)) {
-            Toast.makeText(this, "Не удалось инициализировать ядро mGBA", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, getString(R.string.toast_core_init_failed), Toast.LENGTH_LONG).show()
             finish(); return
         }
 
@@ -200,7 +200,7 @@ class EmulationActivity : ComponentActivity(), SurfaceHolder.Callback {
 
         val loaded = loadRom(gameUri)
         if (!loaded) {
-            Toast.makeText(this, "Не удалось загрузить ROM-файл", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, getString(R.string.toast_rom_load_failed), Toast.LENGTH_LONG).show()
             core.destroy(); finish(); return
         }
 
@@ -302,7 +302,7 @@ class EmulationActivity : ComponentActivity(), SurfaceHolder.Callback {
         if (hotkeySave != 0 && keyCode == hotkeySave) {
             if (event.action == KeyEvent.ACTION_DOWN) {
                 val ok = core.saveState(0, stateDirPath)
-                Toast.makeText(this, if (ok) "💾 Сохранено (слот 0)" else "Ошибка сохранения", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, if (ok) getString(R.string.toast_state_saved) else getString(R.string.toast_state_save_error), Toast.LENGTH_SHORT).show()
             }
             return true
         }
@@ -311,7 +311,7 @@ class EmulationActivity : ComponentActivity(), SurfaceHolder.Callback {
         if (hotkeyLoad != 0 && keyCode == hotkeyLoad) {
             if (event.action == KeyEvent.ACTION_DOWN) {
                 val ok = core.loadState(0, stateDirPath)
-                Toast.makeText(this, if (ok) "📂 Загружено (слот 0)" else "Слот 0 пуст", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, if (ok) getString(R.string.toast_state_loaded) else getString(R.string.toast_state_slot_empty), Toast.LENGTH_SHORT).show()
             }
             return true
         }
@@ -404,15 +404,15 @@ class EmulationActivity : ComponentActivity(), SurfaceHolder.Callback {
         overlayView.clearAllKeys()
 
         val items = arrayOf(
-            "▶  Продолжить игру",
-            "💾  Быстрое сохранение",
-            "📂  Быстрая загрузка",
-            "⚙  Настройки",
-            "🚪  Сохранить и выйти в меню"
+            getString(R.string.pause_resume),
+            getString(R.string.pause_quick_save),
+            getString(R.string.pause_quick_load),
+            getString(R.string.pause_settings),
+            getString(R.string.pause_save_and_exit)
         )
 
         AlertDialog.Builder(this, android.R.style.Theme_DeviceDefault_Dialog_Alert)
-            .setTitle("mGBA — Пауза")
+            .setTitle(getString(R.string.pause_title))
             .setItems(items) { dialog, which ->
                 dialog.dismiss()
                 when (which) {
@@ -422,13 +422,13 @@ class EmulationActivity : ComponentActivity(), SurfaceHolder.Callback {
                     }
                     1 -> { // Quick Save
                         val ok = core.saveState(0, stateDirPath)
-                        Toast.makeText(this, if (ok) "Сохранено в слот 0" else "Ошибка сохранения", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, if (ok) getString(R.string.toast_state_saved) else getString(R.string.toast_state_save_error), Toast.LENGTH_SHORT).show()
                         isPausedByMenu = false
                         applyImmersiveFullscreen()
                     }
                     2 -> { // Quick Load
                         val ok = core.loadState(0, stateDirPath)
-                        Toast.makeText(this, if (ok) "Загружено из слота 0" else "Слот 0 пуст", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, if (ok) getString(R.string.toast_state_loaded) else getString(R.string.toast_state_slot_empty), Toast.LENGTH_SHORT).show()
                         isPausedByMenu = false
                         applyImmersiveFullscreen()
                     }

@@ -164,7 +164,7 @@ fun LibraryTopBar(
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.Sort,
-                            contentDescription = "Сортировка",
+                            contentDescription = stringResource(R.string.sort_title),
                             tint = TextSecondary,
                             modifier = Modifier.size(20.dp)
                         )
@@ -184,7 +184,7 @@ fun LibraryTopBar(
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         Text(
-                                            text = option.displayName,
+                                            text = stringResource(option.labelResId),
                                             color = if (option == currentSort) AccentPrimary else TextPrimary,
                                             fontWeight = if (option == currentSort) FontWeight.Bold else FontWeight.Normal
                                         )

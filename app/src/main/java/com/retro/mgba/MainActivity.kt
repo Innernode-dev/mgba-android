@@ -81,15 +81,15 @@ class MainActivity : ComponentActivity() {
                         val persistentUri = com.retro.mgba.data.storage.StorageHelper.saveCustomCover(applicationContext, game.uri, coverUri)
                         if (persistentUri != null) {
                             viewModel.onCustomCoverAssigned(game.uri, Uri.parse(persistentUri))
-                            android.widget.Toast.makeText(this@MainActivity, "Обложка сохранена", android.widget.Toast.LENGTH_SHORT).show()
+                            android.widget.Toast.makeText(this@MainActivity, getString(R.string.toast_cover_updated_generic), android.widget.Toast.LENGTH_SHORT).show()
                         } else {
-                            android.widget.Toast.makeText(this@MainActivity, "Не удалось загрузить изображение", android.widget.Toast.LENGTH_SHORT).show()
+                            android.widget.Toast.makeText(this@MainActivity, getString(R.string.toast_cover_load_error), android.widget.Toast.LENGTH_SHORT).show()
                         }
                     },
                     onRemoveCustomCover = { game ->
                         com.retro.mgba.data.storage.StorageHelper.deleteCustomCover(applicationContext, game.uri)
                         viewModel.onRemoveCustomCover(game.uri)
-                        android.widget.Toast.makeText(this@MainActivity, "Обложка сброшена", android.widget.Toast.LENGTH_SHORT).show()
+                        android.widget.Toast.makeText(this@MainActivity, getString(R.string.toast_cover_reset), android.widget.Toast.LENGTH_SHORT).show()
                     },
                     onDeleteGame = { viewModel.onDeleteGame(it) },
                     onShowDetails = { viewModel.onShowDetails(it) },

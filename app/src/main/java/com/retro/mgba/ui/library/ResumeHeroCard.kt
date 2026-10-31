@@ -33,12 +33,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
+import com.retro.mgba.R
 import com.retro.mgba.data.db.GameEntity
 import com.retro.mgba.ui.navigation.handheldFocusable
 import com.retro.mgba.ui.theme.AccentPrimary
@@ -131,7 +133,7 @@ fun ResumeHeroCard(
                                     .background(ActiveIndicatorGreen, CircleShape)
                             )
                             Text(
-                                text = "НЕДАВНО ЗАПУСКАЛИ",
+                                text = stringResource(R.string.hero_recently_played),
                                 fontSize = 10.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = ActiveIndicatorGreen,
@@ -179,7 +181,7 @@ fun ResumeHeroCard(
                                 color = TextSecondary
                             )
                             Text(
-                                text = "Время в игре: ${game.formattedPlayTime}",
+                                text = stringResource(R.string.hero_playtime_prefix, game.formattedPlayTime),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = TextMuted
                             )
@@ -205,7 +207,7 @@ fun ResumeHeroCard(
                         )
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
-                            text = "ПРОДОЛЖИТЬ",
+                            text = stringResource(R.string.hero_resume_button),
                             fontWeight = FontWeight.Bold,
                             fontSize = 12.sp,
                             letterSpacing = 0.5.sp

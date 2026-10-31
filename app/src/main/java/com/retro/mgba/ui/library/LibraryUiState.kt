@@ -9,23 +9,28 @@ typealias GameUiModel = GameEntity
 /**
  * Platform and category filter options for the library cover grid.
  */
-enum class GameFilter(val displayName: String, val label: String = displayName) {
-    ALL("Все"),
-    GBA("GBA"),
-    GB("GB"),
-    GBC("GBC"),
-    FAVORITES("Избранное")
+enum class GameFilter(val labelResId: Int) {
+    ALL(com.retro.mgba.R.string.tab_all),
+    GBA(com.retro.mgba.R.string.tab_gba),
+    GB(com.retro.mgba.R.string.tab_gb),
+    GBC(com.retro.mgba.R.string.tab_gbc),
+    FAVORITES(com.retro.mgba.R.string.tab_favorites);
+
+    val displayName: String get() = name
+    val label: String get() = name
 }
 
 /**
  * Sort options for game presentation in DuckStation grid.
  */
-enum class SortOrder(val displayName: String) {
-    TITLE_ASC("По названию (А-Я)"),
-    TITLE_DESC("По названию (Я-А)"),
-    RECENT_DESC("Недавно запущенные"),
-    SIZE_DESC("По размеру (убывание)"),
-    SIZE_ASC("По размеру (возрастание)")
+enum class SortOrder(val labelResId: Int) {
+    TITLE_ASC(com.retro.mgba.R.string.sort_title_asc),
+    TITLE_DESC(com.retro.mgba.R.string.sort_title_desc),
+    RECENT_DESC(com.retro.mgba.R.string.sort_recent),
+    SIZE_DESC(com.retro.mgba.R.string.sort_size_desc),
+    SIZE_ASC(com.retro.mgba.R.string.sort_size_asc);
+
+    val displayName: String get() = name
 }
 
 typealias SortOption = SortOrder

@@ -11,7 +11,7 @@ object LocaleHelper {
     const val KEY_LANGUAGE = "app_language"
 
     val SUPPORTED_LANGUAGES = listOf(
-        "" to "Автоматически (По языку телефона)",
+        "" to "Auto (System Language)",
         "ru" to "Русский (Russian)",
         "en" to "English",
         "es" to "Español (Spanish)",
@@ -51,10 +51,18 @@ object LocaleHelper {
                 context.resources.configuration.locale ?: Locale.getDefault()
             }
             val sysName = systemLocale.getDisplayLanguage(systemLocale).replaceFirstChar { it.uppercase() }
-            return "Авто ($sysName)"
+            return try {
+                context.getString(com.retro.mgba.R.string.locale_auto_format, sysName)
+            } catch (_: Exception) {
+                "Auto ($sysName)"
+            }
         }
         return SUPPORTED_LANGUAGES.firstOrNull { it.first == currentCode }?.second
-            ?: "Авто (По языку телефона)"
+            ?: try {
+                context.getString(com.retro.mgba.R.string.locale_auto_device)
+            } catch (_: Exception) {
+                "Auto (System)"
+            }
     }
 
     fun setLanguage(context: Context, langCode: String) {

@@ -98,25 +98,47 @@ class SettingsActivity : ComponentActivity() {
         const val KEY_HOTKEY_LOAD_CODE = "hotkey_load_code"
         const val KEY_HOTKEY_PAUSE_CODE = "hotkey_pause_code"
 
-        fun getReadableKeyName(keyCode: Int): String = when (keyCode) {
-            0 -> "Отключено"
-            KeyEvent.KEYCODE_BUTTON_A -> "Кнопка A"
-            KeyEvent.KEYCODE_BUTTON_B -> "Кнопка B"
-            KeyEvent.KEYCODE_BUTTON_X -> "Кнопка X"
-            KeyEvent.KEYCODE_BUTTON_Y -> "Кнопка Y"
-            KeyEvent.KEYCODE_BUTTON_L1 -> "LB (Левый бампер)"
-            KeyEvent.KEYCODE_BUTTON_R1 -> "RB (Правый бампер)"
-            KeyEvent.KEYCODE_BUTTON_L2 -> "LT (Левый триггер)"
-            KeyEvent.KEYCODE_BUTTON_R2 -> "RT (Правый триггер)"
-            KeyEvent.KEYCODE_BUTTON_THUMBL -> "LS (Левый стик)"
-            KeyEvent.KEYCODE_BUTTON_THUMBR -> "RS (Правый стик)"
-            KeyEvent.KEYCODE_BUTTON_START -> "START (Меню)"
-            KeyEvent.KEYCODE_BUTTON_SELECT -> "SELECT (Просмотр)"
+        fun getReadableKeyName(context: Context, keyCode: Int): String = when (keyCode) {
+            0 -> context.getString(R.string.key_disabled)
+            KeyEvent.KEYCODE_BUTTON_A -> context.getString(R.string.key_btn_a)
+            KeyEvent.KEYCODE_BUTTON_B -> context.getString(R.string.key_btn_b)
+            KeyEvent.KEYCODE_BUTTON_X -> context.getString(R.string.key_btn_x)
+            KeyEvent.KEYCODE_BUTTON_Y -> context.getString(R.string.key_btn_y)
+            KeyEvent.KEYCODE_BUTTON_L1 -> context.getString(R.string.key_lb)
+            KeyEvent.KEYCODE_BUTTON_R1 -> context.getString(R.string.key_rb)
+            KeyEvent.KEYCODE_BUTTON_L2 -> context.getString(R.string.key_lt)
+            KeyEvent.KEYCODE_BUTTON_R2 -> context.getString(R.string.key_rt)
+            KeyEvent.KEYCODE_BUTTON_THUMBL -> context.getString(R.string.key_ls)
+            KeyEvent.KEYCODE_BUTTON_THUMBR -> context.getString(R.string.key_rs)
+            KeyEvent.KEYCODE_BUTTON_START -> context.getString(R.string.key_start)
+            KeyEvent.KEYCODE_BUTTON_SELECT -> context.getString(R.string.key_select_btn)
             KeyEvent.KEYCODE_BUTTON_MODE -> "XBOX / GUIDE"
-            KeyEvent.KEYCODE_DPAD_UP -> "D-Pad Вверх"
-            KeyEvent.KEYCODE_DPAD_DOWN -> "D-Pad Вниз"
-            KeyEvent.KEYCODE_DPAD_LEFT -> "D-Pad Влево"
-            KeyEvent.KEYCODE_DPAD_RIGHT -> "D-Pad Вправо"
+            KeyEvent.KEYCODE_DPAD_UP -> context.getString(R.string.key_dpad_up)
+            KeyEvent.KEYCODE_DPAD_DOWN -> context.getString(R.string.key_dpad_down)
+            KeyEvent.KEYCODE_DPAD_LEFT -> context.getString(R.string.key_dpad_left)
+            KeyEvent.KEYCODE_DPAD_RIGHT -> context.getString(R.string.key_dpad_right)
+            else -> KeyEvent.keyCodeToString(keyCode).removePrefix("KEYCODE_")
+        }
+
+        fun getReadableKeyName(keyCode: Int): String = when (keyCode) {
+            0 -> "Disabled"
+            KeyEvent.KEYCODE_BUTTON_A -> "Button A"
+            KeyEvent.KEYCODE_BUTTON_B -> "Button B"
+            KeyEvent.KEYCODE_BUTTON_X -> "Button X"
+            KeyEvent.KEYCODE_BUTTON_Y -> "Button Y"
+            KeyEvent.KEYCODE_BUTTON_L1 -> "LB"
+            KeyEvent.KEYCODE_BUTTON_R1 -> "RB"
+            KeyEvent.KEYCODE_BUTTON_L2 -> "LT"
+            KeyEvent.KEYCODE_BUTTON_R2 -> "RT"
+            KeyEvent.KEYCODE_BUTTON_THUMBL -> "LS"
+            KeyEvent.KEYCODE_BUTTON_THUMBR -> "RS"
+            KeyEvent.KEYCODE_BUTTON_START -> "START"
+            KeyEvent.KEYCODE_BUTTON_SELECT -> "SELECT"
+            KeyEvent.KEYCODE_BUTTON_MODE -> "XBOX / GUIDE"
+            KeyEvent.KEYCODE_DPAD_UP -> "D-Pad Up"
+            KeyEvent.KEYCODE_DPAD_DOWN -> "D-Pad Down"
+            KeyEvent.KEYCODE_DPAD_LEFT -> "D-Pad Left"
+            KeyEvent.KEYCODE_DPAD_RIGHT -> "D-Pad Right"
             else -> KeyEvent.keyCodeToString(keyCode).removePrefix("KEYCODE_")
         }
     }
@@ -237,7 +259,7 @@ fun NestedSettingsScreen(
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Назад",
+                            contentDescription = stringResource(R.string.back),
                             tint = TextPrimary
                         )
                     }
@@ -319,14 +341,14 @@ fun MainSettingsMenu(onNavigate: (SettingsSubMenu) -> Unit) {
                 HorizontalDivider(color = SurfaceBorderSubtle)
                 SettingsNavigationRow(
                     title = stringResource(R.string.menu_saves),
-                    subtitle = "Импорт, экспорт (.sav, .ss)",
+                    subtitle = stringResource(R.string.menu_saves_subtitle),
                     icon = Icons.Filled.FolderSpecial,
                     onClick = { onNavigate(SettingsSubMenu.SAVES_MANAGER) }
                 )
                 HorizontalDivider(color = SurfaceBorderSubtle)
                 SettingsNavigationRow(
                     title = stringResource(R.string.menu_covers),
-                    subtitle = "Кастомные обложки картриджей",
+                    subtitle = stringResource(R.string.menu_covers_subtitle),
                     icon = Icons.Filled.Image,
                     onClick = { onNavigate(SettingsSubMenu.COVERS_MANAGER) }
                 )
@@ -340,7 +362,7 @@ fun MainSettingsMenu(onNavigate: (SettingsSubMenu) -> Unit) {
                 HorizontalDivider(color = SurfaceBorderSubtle)
                 SettingsNavigationRow(
                     title = stringResource(R.string.menu_about),
-                    subtitle = "mGBA 0.10.5, Inner Dev & KatOriginal",
+                    subtitle = stringResource(R.string.menu_about_subtitle),
                     icon = Icons.Filled.Info,
                     onClick = { onNavigate(SettingsSubMenu.ABOUT) }
                 )
@@ -382,6 +404,24 @@ fun GraphicsSubMenu(prefs: SharedPreferences) {
     var showFilterDialog by remember { mutableStateOf(false) }
     var showOrientationDialog by remember { mutableStateOf(false) }
 
+    val aspectOptions = listOf(
+        stringResource(R.string.aspect_ratio_native),
+        stringResource(R.string.aspect_ratio_integer),
+        stringResource(R.string.aspect_ratio_stretch)
+    )
+
+    val filterOptions = listOf(
+        stringResource(R.string.shader_filter_nearest),
+        stringResource(R.string.shader_filter_bilinear),
+        stringResource(R.string.shader_filter_lcd)
+    )
+
+    val orientationOptions = listOf(
+        stringResource(R.string.orientation_auto),
+        stringResource(R.string.orientation_landscape),
+        stringResource(R.string.orientation_portrait)
+    )
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -395,35 +435,20 @@ fun GraphicsSubMenu(prefs: SharedPreferences) {
         ) {
             Column {
                 SettingsRow(
-                    title = "Размер экрана",
-                    subtitle = when (aspectRatio) {
-                        NativeCore.ASPECT_RATIO_NATIVE  -> "Оригинал 3:2"
-                        NativeCore.ASPECT_RATIO_INTEGER -> "Целочисленный (Пиксель-в-пиксель)"
-                        NativeCore.ASPECT_RATIO_STRETCH -> "Растянуть на весь экран"
-                        else -> "Оригинал 3:2"
-                    },
+                    title = stringResource(R.string.screen_size),
+                    subtitle = aspectOptions.getOrElse(aspectRatio) { aspectOptions[0] },
                     onClick = { showAspectDialog = true }
                 )
                 HorizontalDivider(color = SurfaceBorderSubtle)
                 SettingsRow(
-                    title = "Сглаживание",
-                    subtitle = when (shaderFilter) {
-                        NativeCore.FILTER_NEAREST  -> "Без сглаживания (Пиксели)"
-                        NativeCore.FILTER_BILINEAR -> "Сглаживание (Bilinear)"
-                        NativeCore.FILTER_LCD_GRID -> "Ретро LCD-сетка"
-                        else -> "Без сглаживания"
-                    },
+                    title = stringResource(R.string.smoothing),
+                    subtitle = filterOptions.getOrElse(shaderFilter) { filterOptions[0] },
                     onClick = { showFilterDialog = true }
                 )
                 HorizontalDivider(color = SurfaceBorderSubtle)
                 SettingsRow(
-                    title = "Поворот экрана",
-                    subtitle = when (orientation) {
-                        0 -> "Автоповорот"
-                        1 -> "Только горизонтально"
-                        2 -> "Только вертикально"
-                        else -> "Автоповорот"
-                    },
+                    title = stringResource(R.string.screen_rotation),
+                    subtitle = orientationOptions.getOrElse(orientation) { orientationOptions[0] },
                     onClick = { showOrientationDialog = true }
                 )
             }
@@ -432,8 +457,8 @@ fun GraphicsSubMenu(prefs: SharedPreferences) {
 
     if (showAspectDialog) {
         SingleChoiceDialog(
-            title = "Размер экрана",
-            options = listOf("Оригинал 3:2", "Целочисленный (Пиксель-в-пиксель)", "Растянуть на весь экран"),
+            title = stringResource(R.string.screen_size),
+            options = aspectOptions,
             selectedIndex = aspectRatio,
             onSelect = {
                 aspectRatio = it
@@ -446,8 +471,8 @@ fun GraphicsSubMenu(prefs: SharedPreferences) {
 
     if (showFilterDialog) {
         SingleChoiceDialog(
-            title = "Сглаживание",
-            options = listOf("Без сглаживания (Пиксели)", "Сглаживание (Bilinear)", "Ретро LCD-сетка"),
+            title = stringResource(R.string.smoothing),
+            options = filterOptions,
             selectedIndex = shaderFilter,
             onSelect = {
                 shaderFilter = it
@@ -460,8 +485,8 @@ fun GraphicsSubMenu(prefs: SharedPreferences) {
 
     if (showOrientationDialog) {
         SingleChoiceDialog(
-            title = "Поворот экрана",
-            options = listOf("Автоповорот", "Только горизонтально", "Только вертикально"),
+            title = stringResource(R.string.screen_rotation),
+            options = orientationOptions,
             selectedIndex = orientation,
             onSelect = {
                 orientation = it
@@ -520,15 +545,15 @@ fun ControlsSubMenu(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         // Section: Сенсорное управление
-        SettingsCategoryHeader(title = "Экранные кнопки", icon = Icons.Filled.TouchApp)
+        SettingsCategoryHeader(title = stringResource(R.string.touch_controls_header), icon = Icons.Filled.TouchApp)
         Card(
             shape = RoundedCornerShape(12.dp),
             colors = CardDefaults.cardColors(containerColor = SurfaceCard)
         ) {
             Column {
                 SettingsSwitchRow(
-                    title = "Экранные кнопки",
-                    subtitle = if (controlsVisible) "Отображаются на экране" else "Полностью скрыты (для геймпада / консоли)",
+                    title = stringResource(R.string.touch_controls_visible),
+                    subtitle = if (controlsVisible) stringResource(R.string.touch_controls_visible_desc_on) else stringResource(R.string.touch_controls_visible_desc_off),
                     checked = controlsVisible,
                     onCheckedChange = {
                         controlsVisible = it
@@ -539,8 +564,8 @@ fun ControlsSubMenu(
                 if (controlsVisible) {
                     HorizontalDivider(color = SurfaceBorderSubtle)
                     SettingsRow(
-                        title = "Вид экранных кнопок",
-                        subtitle = if (dpadType == TouchOverlayView.DPAD_TYPE_STICK) "Аналоговый стик / колёсико" else "Крестовина со стрелочками",
+                        title = stringResource(R.string.dpad_style),
+                        subtitle = if (dpadType == TouchOverlayView.DPAD_TYPE_STICK) stringResource(R.string.dpad_style_stick) else stringResource(R.string.dpad_style_classic),
                         onClick = { showDpadTypeDialog = true }
                     )
                     HorizontalDivider(color = SurfaceBorderSubtle)
@@ -550,7 +575,7 @@ fun ControlsSubMenu(
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Text(
-                                text = "Прозрачность кнопок",
+                                text = stringResource(R.string.button_opacity),
                                 color = TextPrimary,
                                 fontSize = 15.sp,
                                 fontWeight = FontWeight.Medium
@@ -581,37 +606,37 @@ fun ControlsSubMenu(
 
                 HorizontalDivider(color = SurfaceBorderSubtle)
                 SettingsRow(
-                    title = "Раскладка кнопок A/B",
-                    subtitle = if (layoutProfile == 0) "Стандартная (A = A, B = B)" else "Nintendo (Инверсия: A = B, B = A)",
+                    title = stringResource(R.string.ab_layout),
+                    subtitle = if (layoutProfile == 0) stringResource(R.string.ab_layout_standard) else stringResource(R.string.ab_layout_swapped),
                     onClick = { showProfileDialog = true }
                 )
             }
         }
 
         // Section: Назначение кнопок геймпада (Xbox)
-        SettingsCategoryHeader(title = "Назначение кнопок геймпада (Xbox)", icon = Icons.Filled.SportsEsports)
+        SettingsCategoryHeader(title = stringResource(R.string.gamepad_mapping), icon = Icons.Filled.SportsEsports)
         Card(
             shape = RoundedCornerShape(12.dp),
             colors = CardDefaults.cardColors(containerColor = SurfaceCard)
         ) {
             Column {
                 val mappingRows = listOf(
-                    Triple("Кнопка A", SettingsActivity.KEY_BTN_A, btnA),
-                    Triple("Кнопка B", SettingsActivity.KEY_BTN_B, btnB),
-                    Triple("Левый бампер (LB)", SettingsActivity.KEY_BTN_L, btnL),
-                    Triple("Правый бампер (RB)", SettingsActivity.KEY_BTN_R, btnR),
-                    Triple("Кнопка START", SettingsActivity.KEY_BTN_START, btnStart),
-                    Triple("Кнопка SELECT", SettingsActivity.KEY_BTN_SELECT, btnSelect),
-                    Triple("D-Pad Вверх", SettingsActivity.KEY_BTN_UP, btnUp),
-                    Triple("D-Pad Вниз", SettingsActivity.KEY_BTN_DOWN, btnDown),
-                    Triple("D-Pad Влево", SettingsActivity.KEY_BTN_LEFT, btnLeft),
-                    Triple("D-Pad Вправо", SettingsActivity.KEY_BTN_RIGHT, btnRight),
+                    Triple(stringResource(R.string.key_btn_a), SettingsActivity.KEY_BTN_A, btnA),
+                    Triple(stringResource(R.string.key_btn_b), SettingsActivity.KEY_BTN_B, btnB),
+                    Triple(stringResource(R.string.key_lb), SettingsActivity.KEY_BTN_L, btnL),
+                    Triple(stringResource(R.string.key_rb), SettingsActivity.KEY_BTN_R, btnR),
+                    Triple(stringResource(R.string.key_start), SettingsActivity.KEY_BTN_START, btnStart),
+                    Triple(stringResource(R.string.key_select_btn), SettingsActivity.KEY_BTN_SELECT, btnSelect),
+                    Triple(stringResource(R.string.key_dpad_up), SettingsActivity.KEY_BTN_UP, btnUp),
+                    Triple(stringResource(R.string.key_dpad_down), SettingsActivity.KEY_BTN_DOWN, btnDown),
+                    Triple(stringResource(R.string.key_dpad_left), SettingsActivity.KEY_BTN_LEFT, btnLeft),
+                    Triple(stringResource(R.string.key_dpad_right), SettingsActivity.KEY_BTN_RIGHT, btnRight),
                 )
 
                 mappingRows.forEachIndexed { index, (label, key, currentVal) ->
                     SettingsRow(
                         title = label,
-                        subtitle = SettingsActivity.getReadableKeyName(currentVal),
+                        subtitle = SettingsActivity.getReadableKeyName(context, currentVal),
                         onClick = {
                             keyListeningTargetName = label
                             keyListeningPrefKey = key
@@ -666,34 +691,34 @@ fun ControlsSubMenu(
                             btnDown = KeyEvent.KEYCODE_DPAD_DOWN
                             btnLeft = KeyEvent.KEYCODE_DPAD_LEFT
                             btnRight = KeyEvent.KEYCODE_DPAD_RIGHT
-                            Toast.makeText(context, "Управление сброшено по умолчанию", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, context.getString(R.string.toast_controls_reset), Toast.LENGTH_SHORT).show()
                         },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(8.dp)
                     ) {
-                        Text(text = "Сбросить управление по умолчанию", fontSize = 13.sp)
+                        Text(text = stringResource(R.string.reset_controls_default), fontSize = 13.sp)
                     }
                 }
             }
         }
 
         // Section: Быстрые клавиши
-        SettingsCategoryHeader(title = "Быстрые клавиши", icon = Icons.Filled.Bolt)
+        SettingsCategoryHeader(title = stringResource(R.string.hotkeys), icon = Icons.Filled.Bolt)
         Card(
             shape = RoundedCornerShape(12.dp),
             colors = CardDefaults.cardColors(containerColor = SurfaceCard)
         ) {
             Column {
                 val hotkeyRows = listOf(
-                    Triple("Быстрое сохранение", SettingsActivity.KEY_HOTKEY_SAVE_CODE, hotkeySave),
-                    Triple("Быстрая загрузка", SettingsActivity.KEY_HOTKEY_LOAD_CODE, hotkeyLoad),
-                    Triple("Меню паузы", SettingsActivity.KEY_HOTKEY_PAUSE_CODE, hotkeyPause),
+                    Triple(stringResource(R.string.quick_save), SettingsActivity.KEY_HOTKEY_SAVE_CODE, hotkeySave),
+                    Triple(stringResource(R.string.quick_load), SettingsActivity.KEY_HOTKEY_LOAD_CODE, hotkeyLoad),
+                    Triple(stringResource(R.string.pause_menu), SettingsActivity.KEY_HOTKEY_PAUSE_CODE, hotkeyPause),
                 )
 
                 hotkeyRows.forEachIndexed { index, (label, key, currentVal) ->
                     SettingsRow(
                         title = label,
-                        subtitle = SettingsActivity.getReadableKeyName(currentVal),
+                        subtitle = SettingsActivity.getReadableKeyName(context, currentVal),
                         onClick = {
                             keyListeningTargetName = label
                             keyListeningPrefKey = key
@@ -721,8 +746,8 @@ fun ControlsSubMenu(
 
     if (showDpadTypeDialog) {
         SingleChoiceDialog(
-            title = "Вид экранных кнопок",
-            options = listOf("Крестовина со стрелочками", "Аналоговый стик / колёсико"),
+            title = stringResource(R.string.dpad_style),
+            options = listOf(stringResource(R.string.dpad_style_classic), stringResource(R.string.dpad_style_stick)),
             selectedIndex = dpadType,
             onSelect = {
                 dpadType = it
@@ -735,8 +760,8 @@ fun ControlsSubMenu(
 
     if (showProfileDialog) {
         SingleChoiceDialog(
-            title = "Раскладка кнопок A/B",
-            options = listOf("Стандартная (A = A, B = B)", "Nintendo (Инверсия: A = B, B = A)"),
+            title = stringResource(R.string.ab_layout),
+            options = listOf(stringResource(R.string.ab_layout_standard), stringResource(R.string.ab_layout_swapped)),
             selectedIndex = layoutProfile,
             onSelect = {
                 layoutProfile = it
@@ -782,21 +807,21 @@ fun ControlsSubMenu(
                     )
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(
-                        text = "Назначение кнопки",
+                        text = stringResource(R.string.key_capture_title),
                         color = TextPrimary,
                         fontWeight = FontWeight.Bold,
                         fontSize = 18.sp
                     )
                     Spacer(modifier = Modifier.height(6.dp))
                     Text(
-                        text = "Действие: $targetName",
+                        text = stringResource(R.string.key_capture_action, targetName),
                         color = AccentPrimary,
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 15.sp
                     )
                     Spacer(modifier = Modifier.height(10.dp))
                     Text(
-                        text = "Нажмите клавишу на геймпаде (Xbox / Switch)...",
+                        text = stringResource(R.string.key_capture_prompt),
                         color = TextPrimary,
                         fontSize = 13.sp,
                         textAlign = androidx.compose.ui.text.style.TextAlign.Center
@@ -809,7 +834,7 @@ fun ControlsSubMenu(
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(8.dp)
                         ) {
-                            Text(text = "Выбрать кнопку вручную из списка", fontSize = 13.sp)
+                            Text(text = stringResource(R.string.key_capture_manual), fontSize = 13.sp)
                         }
                     } else {
                         Spacer(modifier = Modifier.height(12.dp))
@@ -862,11 +887,11 @@ fun ControlsSubMenu(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
-                                    text = SettingsActivity.getReadableKeyName(code),
+                                    text = SettingsActivity.getReadableKeyName(context, code),
                                     color = TextPrimary,
                                     fontSize = 13.sp
                                 )
-                                Text(text = "Выбрать", color = AccentPrimary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                Text(text = stringResource(R.string.select), color = AccentPrimary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                             }
                             HorizontalDivider(color = SurfaceBorderSubtle)
                         }
@@ -902,7 +927,7 @@ fun ControlsSubMenu(
                             modifier = Modifier.weight(1f),
                             shape = RoundedCornerShape(8.dp)
                         ) {
-                            Text(text = "Отключить", color = Color(0xFFEF4444), fontSize = 12.sp)
+                            Text(text = stringResource(R.string.disable), color = Color(0xFFEF4444), fontSize = 12.sp)
                         }
                         Button(
                             onClick = {
@@ -914,7 +939,7 @@ fun ControlsSubMenu(
                             shape = RoundedCornerShape(8.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF262638))
                         ) {
-                            Text(text = "Отмена", color = TextPrimary, fontSize = 12.sp)
+                            Text(text = stringResource(R.string.cancel), color = TextPrimary, fontSize = 12.sp)
                         }
                     }
                 }
@@ -957,10 +982,10 @@ fun SavesManagerSubMenu(context: Context) {
                     StorageHelper.importSave(context, uri)
                 }
                 if (ok) {
-                    Toast.makeText(context, "Сохранение успешно импортировано", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, context.getString(R.string.toast_save_imported), Toast.LENGTH_SHORT).show()
                     refreshList()
                 } else {
-                    Toast.makeText(context, "Ошибка при импорте файла", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, context.getString(R.string.toast_save_import_error), Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -977,9 +1002,9 @@ fun SavesManagerSubMenu(context: Context) {
                     StorageHelper.exportSave(context, file, destUri)
                 }
                 if (ok) {
-                    Toast.makeText(context, "Сохранение выгружено: ${file.name}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, context.getString(R.string.toast_save_exported, file.name), Toast.LENGTH_SHORT).show()
                 } else {
-                    Toast.makeText(context, "Ошибка выгрузки файла", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, context.getString(R.string.toast_save_export_error), Toast.LENGTH_SHORT).show()
                 }
                 fileToExport = null
             }
@@ -1002,7 +1027,7 @@ fun SavesManagerSubMenu(context: Context) {
         ) {
             Column(modifier = Modifier.padding(14.dp)) {
                 Text(
-                    text = "Папка данных (Android/data):",
+                    text = stringResource(R.string.saves_data_folder),
                     color = TextSecondary,
                     fontSize = 12.sp
                 )
@@ -1022,7 +1047,7 @@ fun SavesManagerSubMenu(context: Context) {
                 ) {
                     Icon(imageVector = Icons.Filled.Upload, contentDescription = null, modifier = Modifier.size(18.dp))
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text(text = "Загрузить сохранение (Импорт)", fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                    Text(text = stringResource(R.string.saves_import_btn), fontSize = 13.sp, fontWeight = FontWeight.Bold)
                 }
             }
         }
@@ -1030,7 +1055,7 @@ fun SavesManagerSubMenu(context: Context) {
         Spacer(modifier = Modifier.height(12.dp))
 
         Text(
-            text = "Список сохранений (${savesList.size}):",
+            text = stringResource(R.string.saves_list_header, savesList.size),
             color = TextPrimary,
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold
@@ -1046,7 +1071,7 @@ fun SavesManagerSubMenu(context: Context) {
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "Сохранений пока нет.\nСделайте сохранение в игре или импортируйте файл.",
+                    text = stringResource(R.string.saves_empty),
                     color = TextSecondary,
                     fontSize = 13.sp,
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center
@@ -1085,7 +1110,7 @@ fun SavesManagerSubMenu(context: Context) {
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     val badgeColor = if (item.isBatterySave) AccentPrimary else Color(0xFF10B981)
-                                    val badgeText = if (item.isBatterySave) "Батареечное (.sav)" else "Быстрое (.ss)"
+                                    val badgeText = if (item.isBatterySave) stringResource(R.string.saves_battery_badge) else stringResource(R.string.saves_state_badge)
                                     Box(
                                         modifier = Modifier
                                             .background(badgeColor.copy(alpha = 0.2f), RoundedCornerShape(4.dp))
@@ -1109,7 +1134,7 @@ fun SavesManagerSubMenu(context: Context) {
                                 ) {
                                     Icon(
                                         imageVector = Icons.Filled.Download,
-                                        contentDescription = "Выгрузить",
+                                        contentDescription = stringResource(R.string.saves_export_tooltip),
                                         tint = AccentPrimary,
                                         modifier = Modifier.size(20.dp)
                                     )
@@ -1129,15 +1154,15 @@ fun SavesManagerSubMenu(context: Context) {
                                                 putExtra(Intent.EXTRA_STREAM, shareUri)
                                                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                                             }
-                                            context.startActivity(Intent.createChooser(shareIntent, "Поделиться сохранением"))
+                                            context.startActivity(Intent.createChooser(shareIntent, context.getString(R.string.saves_share_title)))
                                         } catch (e: Exception) {
-                                            Toast.makeText(context, "Не удалось отправить файл", Toast.LENGTH_SHORT).show()
+                                            Toast.makeText(context, context.getString(R.string.toast_save_share_error), Toast.LENGTH_SHORT).show()
                                         }
                                     }
                                 ) {
                                     Icon(
                                         imageVector = Icons.Filled.Share,
-                                        contentDescription = "Поделиться",
+                                        contentDescription = stringResource(R.string.saves_share_tooltip),
                                         tint = TextSecondary,
                                         modifier = Modifier.size(20.dp)
                                     )
@@ -1149,7 +1174,7 @@ fun SavesManagerSubMenu(context: Context) {
                                 ) {
                                     Icon(
                                         imageVector = Icons.Filled.Delete,
-                                        contentDescription = "Удалить",
+                                        contentDescription = stringResource(R.string.saves_delete_tooltip),
                                         tint = Color(0xFFEF4444),
                                         modifier = Modifier.size(20.dp)
                                     )
@@ -1169,11 +1194,11 @@ fun SavesManagerSubMenu(context: Context) {
             onDismissRequest = { saveToDelete = null },
             containerColor = SurfaceElevated,
             title = {
-                Text(text = "Удалить сохранение?", color = TextPrimary, fontWeight = FontWeight.Bold, fontSize = 17.sp)
+                Text(text = stringResource(R.string.saves_delete_title), color = TextPrimary, fontWeight = FontWeight.Bold, fontSize = 17.sp)
             },
             text = {
                 Text(
-                    text = "Вы уверены, что хотите безвозвратно удалить файл:\n${target.displayName}?",
+                    text = stringResource(R.string.saves_delete_confirm, target.displayName),
                     color = TextSecondary,
                     fontSize = 13.sp
                 )
@@ -1182,18 +1207,18 @@ fun SavesManagerSubMenu(context: Context) {
                 Button(
                     onClick = {
                         target.file.delete()
-                        Toast.makeText(context, "Сохранение удалено", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, context.getString(R.string.toast_save_deleted), Toast.LENGTH_SHORT).show()
                         saveToDelete = null
                         refreshList()
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEF4444))
                 ) {
-                    Text(text = "Удалить", color = Color.White)
+                    Text(text = stringResource(R.string.delete), color = Color.White)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { saveToDelete = null }) {
-                    Text(text = "Отмена", color = AccentPrimary)
+                    Text(text = stringResource(R.string.cancel), color = AccentPrimary)
                 }
             }
         )
@@ -1240,10 +1265,10 @@ fun CoversManagerSubMenu(context: Context) {
                     uriStr
                 }
                 if (savedUri != null) {
-                    Toast.makeText(context, "Обложка обновлена для ${game.title}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, context.getString(R.string.toast_cover_updated, game.title), Toast.LENGTH_SHORT).show()
                     refreshGames()
                 } else {
-                    Toast.makeText(context, "Не удалось загрузить изображение", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, context.getString(R.string.toast_cover_load_error), Toast.LENGTH_SHORT).show()
                 }
                 selectedGameForCover = null
             }
@@ -1265,7 +1290,7 @@ fun CoversManagerSubMenu(context: Context) {
         ) {
             Column(modifier = Modifier.padding(14.dp)) {
                 Text(
-                    text = "Папка обложек (Android/data):",
+                    text = stringResource(R.string.covers_data_folder),
                     color = TextSecondary,
                     fontSize = 12.sp
                 )
@@ -1282,7 +1307,7 @@ fun CoversManagerSubMenu(context: Context) {
         Spacer(modifier = Modifier.height(12.dp))
 
         Text(
-            text = "Игры в библиотеке (${gamesList.size}):",
+            text = stringResource(R.string.covers_games_count, gamesList.size),
             color = TextPrimary,
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold
@@ -1298,7 +1323,7 @@ fun CoversManagerSubMenu(context: Context) {
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "Игр пока нет.\nДобавьте папку с играми на главном экране.",
+                    text = stringResource(R.string.covers_empty),
                     color = TextSecondary,
                     fontSize = 13.sp,
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center
@@ -1367,7 +1392,7 @@ fun CoversManagerSubMenu(context: Context) {
                                         Text(text = game.system, color = game.badgeColor, fontSize = 10.sp, fontWeight = FontWeight.Bold)
                                     }
 
-                                    val statusText = if (!game.customCoverUri.isNullOrBlank()) "Своя обложка" else "Картридж"
+                                    val statusText = if (!game.customCoverUri.isNullOrBlank()) stringResource(R.string.covers_status_custom) else stringResource(R.string.covers_status_cartridge)
                                     val statusColor = if (!game.customCoverUri.isNullOrBlank()) AccentPrimary else TextMuted
                                     Text(text = statusText, color = statusColor, fontSize = 11.sp)
                                 }
@@ -1385,7 +1410,7 @@ fun CoversManagerSubMenu(context: Context) {
                                     contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp)
                                 ) {
                                     Text(
-                                        text = if (game.customCoverUri.isNullOrBlank()) "Загрузить" else "Заменить",
+                                        text = if (game.customCoverUri.isNullOrBlank()) stringResource(R.string.covers_btn_upload) else stringResource(R.string.covers_btn_replace),
                                         fontSize = 11.sp,
                                         fontWeight = FontWeight.Bold
                                     )
@@ -1395,7 +1420,7 @@ fun CoversManagerSubMenu(context: Context) {
                                     IconButton(onClick = { gameToDeleteCover = game }) {
                                         Icon(
                                             imageVector = Icons.Filled.Delete,
-                                            contentDescription = "Удалить обложку",
+                                            contentDescription = stringResource(R.string.covers_btn_delete),
                                             tint = Color(0xFFEF4444),
                                             modifier = Modifier.size(20.dp)
                                         )
@@ -1415,11 +1440,11 @@ fun CoversManagerSubMenu(context: Context) {
             onDismissRequest = { gameToDeleteCover = null },
             containerColor = SurfaceElevated,
             title = {
-                Text(text = "Удалить обложку?", color = TextPrimary, fontWeight = FontWeight.Bold, fontSize = 17.sp)
+                Text(text = stringResource(R.string.covers_delete_title), color = TextPrimary, fontWeight = FontWeight.Bold, fontSize = 17.sp)
             },
             text = {
                 Text(
-                    text = "Сбросить обложку для «${targetGame.title}» на стандартный картридж?",
+                    text = stringResource(R.string.covers_delete_confirm, targetGame.title),
                     color = TextSecondary,
                     fontSize = 13.sp
                 )
@@ -1432,19 +1457,19 @@ fun CoversManagerSubMenu(context: Context) {
                                 StorageHelper.deleteCustomCover(context, targetGame.uri)
                                 db.gameDao().update(targetGame.copy(customCoverUri = null))
                             }
-                            Toast.makeText(context, "Обложка сброшена", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, context.getString(R.string.toast_cover_reset), Toast.LENGTH_SHORT).show()
                             gameToDeleteCover = null
                             refreshGames()
                         }
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEF4444))
                 ) {
-                    Text(text = "Удалить", color = Color.White)
+                    Text(text = stringResource(R.string.delete), color = Color.White)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { gameToDeleteCover = null }) {
-                    Text(text = "Отмена", color = AccentPrimary)
+                    Text(text = stringResource(R.string.cancel), color = AccentPrimary)
                 }
             }
         )
@@ -1477,7 +1502,7 @@ fun AboutSubMenu() {
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     Text(
-                        text = "mGBA для Android",
+                        text = stringResource(R.string.about_app_title),
                         color = TextPrimary,
                         fontWeight = FontWeight.Bold,
                         fontSize = 18.sp
@@ -1497,7 +1522,7 @@ fun AboutSubMenu() {
                 }
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "• Ядро эмулятора: mGBA 0.10.5 (MPL-2.0)\n• Системы: Game Boy Advance (GBA), Game Boy Color (GBC), Game Boy (GB)\n• Архитектура: arm64-v8a (64-bit)\n• Звук: AAudio / Oboe Low-Latency (48 kHz)\n• Видео: OpenGL ES 3.0 рендерер",
+                    text = stringResource(R.string.about_app_specs),
                     color = TextSecondary,
                     fontSize = 13.sp,
                     lineHeight = 20.sp
@@ -1512,7 +1537,7 @@ fun AboutSubMenu() {
         ) {
             Column(modifier = Modifier.padding(18.dp)) {
                 Text(
-                    text = "Команда разработки",
+                    text = stringResource(R.string.about_team_title),
                     color = TextPrimary,
                     fontWeight = FontWeight.Bold,
                     fontSize = 15.sp
@@ -1538,7 +1563,7 @@ fun AboutSubMenu() {
                             fontSize = 14.sp
                         )
                         Text(
-                            text = "Разработчик приложения (Lead Android Developer)",
+                            text = stringResource(R.string.about_lead_role),
                             color = TextSecondary,
                             fontSize = 12.sp
                         )
@@ -1566,7 +1591,7 @@ fun AboutSubMenu() {
                             fontSize = 14.sp
                         )
                         Text(
-                            text = "Со-автор идеи & главный тестировщик (Co-Author & Lead QA)",
+                            text = stringResource(R.string.about_qa_role),
                             color = TextSecondary,
                             fontSize = 12.sp
                         )
@@ -1583,7 +1608,7 @@ fun AboutSubMenu() {
                         try {
                             val intent = Intent(Intent.ACTION_SENDTO).apply {
                                 data = Uri.parse("mailto:innernode.dev@gmail.com")
-                                putExtra(Intent.EXTRA_SUBJECT, "mGBA Android — Отзыв / Баг-репорт")
+                                putExtra(Intent.EXTRA_SUBJECT, "mGBA Android — Feedback / Bug Report")
                             }
                             context.startActivity(intent)
                         } catch (e: Exception) {
@@ -1599,7 +1624,7 @@ fun AboutSubMenu() {
                         modifier = Modifier.size(18.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text(text = "Написать: innernode.dev@gmail.com", fontSize = 13.sp)
+                    Text(text = stringResource(R.string.about_contact_btn), fontSize = 13.sp)
                 }
             }
         }
@@ -1611,14 +1636,14 @@ fun AboutSubMenu() {
         ) {
             Column(modifier = Modifier.padding(18.dp)) {
                 Text(
-                    text = "Открытый исходный код и форки",
+                    text = stringResource(R.string.about_source_title),
                     color = TextPrimary,
                     fontWeight = FontWeight.Bold,
                     fontSize = 15.sp
                 )
                 Spacer(modifier = Modifier.height(6.dp))
                 Text(
-                    text = "Проект полностью открыт. Каждый участник сообщества может делать свои форки, предлагать улучшения, исправлять баги и присылать пулл-реквесты на GitHub или на почту innernode.dev@gmail.com.",
+                    text = stringResource(R.string.about_source_desc),
                     color = TextSecondary,
                     fontSize = 12.sp,
                     lineHeight = 17.sp
@@ -1627,7 +1652,7 @@ fun AboutSubMenu() {
                 HorizontalDivider(color = SurfaceBorderSubtle)
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
-                    text = "mGBA распространяется под лицензией Mozilla Public License 2.0 (MPL-2.0). Все права на ядро принадлежат Jeffrey Pfau и участникам проекта mGBA.",
+                    text = stringResource(R.string.about_license_desc),
                     color = TextMuted,
                     fontSize = 11.sp,
                     lineHeight = 16.sp
@@ -1855,7 +1880,7 @@ fun SingleChoiceDialog(
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text(text = "Отмена", color = AccentPrimary)
+                Text(text = stringResource(R.string.cancel), color = AccentPrimary)
             }
         }
     )
