@@ -74,6 +74,71 @@ object StorageHelper {
     }
 
     /**
+     * Directory for soft ROM patches (.ips, .ups, .bps) applied on the fly.
+     */
+    fun getPatchesDir(context: Context): File {
+        val base = getBaseDir(context)
+        return File(base, "patches").also { it.mkdirs() }
+    }
+
+    fun findRomPatch(context: Context, sanitizedGameTitle: String): File? {
+        val dir = getPatchesDir(context)
+        val exts = listOf("bps", "ups", "ips")
+        for (ext in exts) {
+            val f = File(dir, "$sanitizedGameTitle.$ext")
+            if (f.exists() && f.isFile && f.length() > 0L) return f
+        }
+        return null
+    }
+
+    fun saveRomPatch(context: Context, sanitizedGameTitle: String, sourceUri: Uri): File? {
+        return try {
+            val origName = getFileNameFromUri(context, sourceUri).orEmpty()
+            val ext = origName.substringAfterLast('.', "").lowercase()
+                .takeIf { it in setOf("ips", "ups", "bps") } ?: "ips"
+            // Remove any previous patch for this game so only one active patch exists
+            deleteRomPatch(context, sanitizedGameTitle)
+            val destFile = File(getPatchesDir(context), "$sanitizedGameTitle.$ext")
+            context.contentResolver.openInputStream(sourceUri)?.use { input ->
+                destFile.outputStream().use { output ->
+                    input.copyTo(output)
+                }
+            } ?: return null
+            if (destFile.length() > 0L) destFile else {
+                destFile.delete()
+                null
+            }
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    fun deleteRomPatch(context: Context, sanitizedGameTitle: String): Boolean {
+        val dir = getPatchesDir(context)
+        var deleted = false
+        for (ext in listOf("bps", "ups", "ips")) {
+            val f = File(dir, "$sanitizedGameTitle.$ext")
+            if (f.exists() && f.delete()) {
+                deleted = true
+            }
+        }
+        return deleted
+    }
+
+    fun saveDownloadedCoverBytes(context: Context, gameUri: String, bytes: ByteArray): String? {
+        if (bytes.isEmpty()) return null
+        return try {
+            val coversDir = getCoversDir(context)
+            val hash = gameUri.hashCode().toString().replace('-', 'n')
+            val destFile = File(coversDir, "cover_$hash.png")
+            destFile.writeBytes(bytes)
+            Uri.fromFile(destFile).toString()
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    /**
      * Copies selected gallery image to persistent local storage and returns file URI.
      */
     fun saveCustomCover(context: Context, gameUri: String, sourceUri: Uri): String? {
@@ -238,5 +303,6 @@ object StorageHelper {
         getScreenshotsDir(context)
         getCoversDir(context)
         getCheatsDir(context)
+        getPatchesDir(context)
     }
 }

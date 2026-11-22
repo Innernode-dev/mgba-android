@@ -204,6 +204,73 @@ class NativeCore {
         return nativeAddCheatSet(handle, name, lines.toTypedArray(), type, enabled)
     }
 
+    // --- GBA Link Cable Network Bridge ---
+
+    data class LinkStatus(
+        val state: Int = LINK_STATE_IDLE,
+        val isHost: Boolean = false,
+        val playerId: Int = -1,
+        val playerCount: Int = 1,
+        val pingMs: Int = -1,
+        val lastError: String? = null
+    ) {
+        val isActive: Boolean
+            get() = state == LINK_STATE_HOSTING || state == LINK_STATE_CONNECTING || state == LINK_STATE_CONNECTED
+    }
+
+    fun startLinkHost(port: Int = DEFAULT_LINK_PORT): Boolean {
+        if (handle == 0L || port !in 1024..65535) return false
+        return nativeLinkStartHost(handle, port)
+    }
+
+    fun connectLinkClient(host: String, port: Int = DEFAULT_LINK_PORT): Boolean {
+        val cleanHost = host.trim()
+        if (handle == 0L || cleanHost.isEmpty() || port !in 1024..65535) return false
+        return nativeLinkConnect(handle, cleanHost, port)
+    }
+
+    fun disconnectLink() {
+        if (handle != 0L) nativeLinkDisconnect(handle)
+    }
+
+    fun getLinkStatus(): LinkStatus {
+        if (handle == 0L) return LinkStatus()
+        return LinkStatus(
+            state = nativeLinkGetState(handle),
+            isHost = nativeLinkIsHost(handle),
+            playerId = nativeLinkGetPlayerId(handle),
+            playerCount = nativeLinkGetPlayerCount(handle),
+            pingMs = nativeLinkGetPingMs(handle),
+            lastError = nativeLinkGetLastError(handle)
+        )
+    }
+
+    // --- Rewind, Soft Patching & Hardware Sensors ---
+
+    fun setRewindEnabled(enabled: Boolean) {
+        if (handle != 0L) nativeSetRewindEnabled(handle, enabled)
+    }
+
+    fun rewindStep(): Boolean {
+        return if (handle != 0L) nativeRewindStep(handle) else false
+    }
+
+    fun loadPatchPath(patchPath: String): Boolean {
+        return if (handle != 0L && patchPath.isNotBlank()) nativeLoadPatchPath(handle, patchPath) else false
+    }
+
+    fun setSensorRotation(tiltX: Int, tiltY: Int, gyroZ: Int) {
+        if (handle != 0L) nativeSetSensorRotation(handle, tiltX, tiltY, gyroZ)
+    }
+
+    fun setSolarLevel(level: Int) {
+        if (handle != 0L) nativeSetSolarLevel(handle, level.coerceIn(0, 10))
+    }
+
+    fun isRumbleActive(): Boolean {
+        return if (handle != 0L) nativeIsRumbleActive(handle) else false
+    }
+
     // --- External Native Declarations (Direct JNI Bindings) ---
 
     external fun nativeCreate(sampleRate: Int, bufferFrames: Int): Long
@@ -245,6 +312,23 @@ class NativeCore {
     external fun nativeClearCheats(handle: Long)
     external fun nativeAddCheatSet(handle: Long, name: String, lines: Array<String>, type: Int, enabled: Boolean): Boolean
 
+    external fun nativeLinkStartHost(handle: Long, port: Int): Boolean
+    external fun nativeLinkConnect(handle: Long, host: String, port: Int): Boolean
+    external fun nativeLinkDisconnect(handle: Long)
+    external fun nativeLinkGetState(handle: Long): Int
+    external fun nativeLinkGetPlayerId(handle: Long): Int
+    external fun nativeLinkGetPlayerCount(handle: Long): Int
+    external fun nativeLinkGetPingMs(handle: Long): Int
+    external fun nativeLinkIsHost(handle: Long): Boolean
+    external fun nativeLinkGetLastError(handle: Long): String?
+
+    external fun nativeSetRewindEnabled(handle: Long, enabled: Boolean)
+    external fun nativeRewindStep(handle: Long): Boolean
+    external fun nativeLoadPatchPath(handle: Long, patchPath: String): Boolean
+    external fun nativeSetSensorRotation(handle: Long, tiltX: Int, tiltY: Int, gyroZ: Int)
+    external fun nativeSetSolarLevel(handle: Long, level: Int)
+    external fun nativeIsRumbleActive(handle: Long): Boolean
+
     companion object {
         // GBA Hardware Key Mask Constants
         const val KEY_A = 1 shl 0
@@ -271,6 +355,14 @@ class NativeCore {
         const val FILTER_NEAREST = 0
         const val FILTER_BILINEAR = 1
         const val FILTER_LCD_GRID = 2
+
+        // GBA Link Cable States
+        const val DEFAULT_LINK_PORT = 55777
+        const val LINK_STATE_IDLE = 0
+        const val LINK_STATE_HOSTING = 1
+        const val LINK_STATE_CONNECTING = 2
+        const val LINK_STATE_CONNECTED = 3
+        const val LINK_STATE_ERROR = 4
 
         init {
             // Load upstream mGBA core shared library first, followed by JNI bridge

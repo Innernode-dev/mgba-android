@@ -17,6 +17,7 @@
 #include <time.h>
 #include <math.h>
 #include <pthread.h>
+#include <stdatomic.h>
 
 #include <mgba/core/core.h>
 #include <mgba/core/config.h>
@@ -25,12 +26,14 @@
 #include <mgba/core/interface.h>
 #include <mgba/core/blip_buf.h>
 #include <mgba/core/cheats.h>
+#include <mgba/gba/interface.h>
 #include <mgba/internal/gba/cheats.h>
 #include <mgba/internal/gb/cheats.h>
 #include <mgba-util/vfs.h>
 
 #include "video/egl_renderer.h"
 #include "audio/oboe_audio.h"
+#include "net/gba_link_bridge.h"
 
 #define LOG_TAG "mGBA_JNI"
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
@@ -41,8 +44,25 @@
 #define MAX_VIDEO_WIDTH 256
 #define MAX_VIDEO_HEIGHT 256
 #define SRAM_DEBOUNCE_INTERVAL_MS 1000
+#define REWIND_MAX_SLOTS 90
+#define REWIND_CAPTURE_INTERVAL 6
 
 typedef struct NativeContext NativeContext;
+
+struct AppRotationSource {
+    struct mRotationSource d;
+    NativeContext *ctx;
+};
+
+struct AppLuminanceSource {
+    struct GBALuminanceSource d;
+    NativeContext *ctx;
+};
+
+struct AppRumble {
+    struct mRumble d;
+    NativeContext *ctx;
+};
 
 struct AppAVStream {
     struct mAVStream stream;
@@ -59,6 +79,7 @@ struct NativeContext {
     ANativeWindow *window;
     EGLRenderer *renderer;
     AudioEngineHandle audio;
+    GbaLinkBridge *linkBridge;
     struct AppAVStream avStream;
     jobject bufferGlobalRef;
 
@@ -84,6 +105,22 @@ struct NativeContext {
     volatile bool sramDirty;
     int64_t lastSramDirtyTimeMs;
     char currentSramPath[1024];
+
+    // Rewind RAM ring buffer (bounded to REWIND_MAX_SLOTS snapshots)
+    bool rewindEnabled;
+    struct VFile *rewindSlots[REWIND_MAX_SLOTS];
+    int rewindHead;  // index of next write slot
+    int rewindCount; // current valid snapshot count (0..REWIND_MAX_SLOTS)
+
+    // Hardware peripherals (Gyro/Tilt, Boktai Solar Sensor, Cartridge Rumble)
+    struct AppRotationSource rotationSource;
+    struct AppLuminanceSource luminanceSource;
+    struct AppRumble rumble;
+    atomic_int_fast32_t sensorTiltX;
+    atomic_int_fast32_t sensorTiltY;
+    atomic_int_fast32_t sensorGyroZ;
+    atomic_uint_fast8_t solarLuminance;
+    atomic_bool rumbleActive;
 };
 
 /* ========================================================================== */
@@ -102,6 +139,68 @@ static void _onSavedataUpdated(void *context) {
         ctx->sramDirty = true;
         ctx->lastSramDirtyTimeMs = _getTimeMs();
         LOGD("SRAM marked dirty by core callback");
+    }
+}
+
+static void _rotSample(struct mRotationSource *source) { (void)source; }
+
+static int32_t _rotReadTiltX(struct mRotationSource *source) {
+    struct AppRotationSource *app = (struct AppRotationSource *)source;
+    return app && app->ctx ? (int32_t)atomic_load(&app->ctx->sensorTiltX) : 0;
+}
+
+static int32_t _rotReadTiltY(struct mRotationSource *source) {
+    struct AppRotationSource *app = (struct AppRotationSource *)source;
+    return app && app->ctx ? (int32_t)atomic_load(&app->ctx->sensorTiltY) : 0;
+}
+
+static int32_t _rotReadGyroZ(struct mRotationSource *source) {
+    struct AppRotationSource *app = (struct AppRotationSource *)source;
+    return app && app->ctx ? (int32_t)atomic_load(&app->ctx->sensorGyroZ) : 0;
+}
+
+static void _lumSample(struct GBALuminanceSource *source) { (void)source; }
+
+static uint8_t _lumRead(struct GBALuminanceSource *source) {
+    struct AppLuminanceSource *app = (struct AppLuminanceSource *)source;
+    return app && app->ctx ? (uint8_t)atomic_load(&app->ctx->solarLuminance) : 0xFF;
+}
+
+static void _rumbleSet(struct mRumble *rumble, int enable) {
+    struct AppRumble *app = (struct AppRumble *)rumble;
+    if (app && app->ctx) {
+        atomic_store(&app->ctx->rumbleActive, enable != 0);
+    }
+}
+
+static void _clearRewindBufferLocked(NativeContext *ctx) {
+    if (!ctx) return;
+    for (int i = 0; i < REWIND_MAX_SLOTS; ++i) {
+        if (ctx->rewindSlots[i]) {
+            ctx->rewindSlots[i]->close(ctx->rewindSlots[i]);
+            ctx->rewindSlots[i] = NULL;
+        }
+    }
+    ctx->rewindHead = 0;
+    ctx->rewindCount = 0;
+}
+
+static void _captureRewindSnapshotLocked(NativeContext *ctx) {
+    if (!ctx || !ctx->core || !ctx->rewindEnabled) return;
+    struct VFile *vf = VFileMemChunk(NULL, 0);
+    if (!vf) return;
+
+    if (mCoreSaveStateNamed(ctx->core, vf, SAVESTATE_SAVEDATA | SAVESTATE_RTC)) {
+        if (ctx->rewindSlots[ctx->rewindHead]) {
+            ctx->rewindSlots[ctx->rewindHead]->close(ctx->rewindSlots[ctx->rewindHead]);
+        }
+        ctx->rewindSlots[ctx->rewindHead] = vf;
+        ctx->rewindHead = (ctx->rewindHead + 1) % REWIND_MAX_SLOTS;
+        if (ctx->rewindCount < REWIND_MAX_SLOTS) {
+            ctx->rewindCount++;
+        }
+    } else {
+        vf->close(vf);
     }
 }
 
@@ -175,7 +274,14 @@ static bool _atomicWriteFile(const char *path, const void *data, size_t size) {
 static void cleanupActiveCore(NativeContext *ctx, JNIEnv *env) {
     if (!ctx) return;
 
-    // 1. Flush SRAM if path is bound
+    // 1. Detach Link Cable network bridge and free rewind RAM buffer
+    if (ctx->linkBridge) {
+        gba_link_bridge_detach_core(ctx->linkBridge);
+    }
+    _clearRewindBufferLocked(ctx);
+    atomic_store(&ctx->rumbleActive, false);
+
+    // 2. Flush SRAM if path is bound
     if (ctx->currentSramPath[0] != '\0' && ctx->core) {
         void *sramData = NULL;
         size_t sramSize = ctx->core->savedataClone(ctx->core, &sramData);
@@ -283,6 +389,25 @@ static bool setupCoreFromVF(NativeContext *ctx, struct VFile *vf, JNIEnv *env, j
     ctx->coreCallbacks.savedataUpdated = _onSavedataUpdated;
     core->addCoreCallbacks(core, &ctx->coreCallbacks);
 
+    // Register hardware peripherals (Gyro/Tilt, Cartridge Rumble, GBA Boktai Solar Sensor)
+    ctx->rotationSource.d.sample = _rotSample;
+    ctx->rotationSource.d.readTiltX = _rotReadTiltX;
+    ctx->rotationSource.d.readTiltY = _rotReadTiltY;
+    ctx->rotationSource.d.readGyroZ = _rotReadGyroZ;
+    ctx->rotationSource.ctx = ctx;
+    core->setPeripheral(core, mPERIPH_ROTATION, &ctx->rotationSource.d);
+
+    ctx->rumble.d.setRumble = _rumbleSet;
+    ctx->rumble.ctx = ctx;
+    core->setPeripheral(core, mPERIPH_RUMBLE, &ctx->rumble.d);
+
+    if (core->platform(core) == mPLATFORM_GBA) {
+        ctx->luminanceSource.d.sample = _lumSample;
+        ctx->luminanceSource.d.readLuminance = _lumRead;
+        ctx->luminanceSource.ctx = ctx;
+        core->setPeripheral(core, mPERIPH_GBA_LUMINANCE, &ctx->luminanceSource.d);
+    }
+
     // Retain JNI global reference to direct ByteBuffer if supplied
     if (bufferObj && env) {
         ctx->bufferGlobalRef = (*env)->NewGlobalRef(env, bufferObj);
@@ -346,6 +471,11 @@ Java_com_retro_mgba_core_NativeCore_nativeCreate(JNIEnv *env, jobject thiz, jint
     ctx->audioMute = false;
     ctx->aspectRatioMode = 0;
     ctx->shaderFilter = 0;
+    atomic_init(&ctx->sensorTiltX, 0);
+    atomic_init(&ctx->sensorTiltY, 0);
+    atomic_init(&ctx->sensorGyroZ, 0);
+    atomic_init(&ctx->solarLuminance, 0xFF);
+    atomic_init(&ctx->rumbleActive, false);
 
     ctx->renderer = egl_renderer_create();
     if (!ctx->renderer) {
@@ -360,6 +490,11 @@ Java_com_retro_mgba_core_NativeCore_nativeCreate(JNIEnv *env, jobject thiz, jint
         audioEngineSetMute(ctx->audio, ctx->audioMute);
     }
 
+    ctx->linkBridge = gba_link_bridge_create();
+    if (!ctx->linkBridge) {
+        LOGE("Failed to initialize GbaLinkBridge");
+    }
+
     LOGI("NativeContext created at %p (renderer=%p, audio=%p)", (void*)ctx, (void*)ctx->renderer, (void*)ctx->audio);
     return (jlong)(intptr_t)ctx;
 }
@@ -372,8 +507,17 @@ Java_com_retro_mgba_core_NativeCore_nativeDestroy(JNIEnv *env, jobject thiz, jlo
 
     LOGI("Destroying NativeContext at %p", (void*)ctx);
 
+    if (ctx->linkBridge) {
+        gba_link_bridge_signal_stop(ctx->linkBridge);
+    }
+
     pthread_mutex_lock(&ctx->mutex);
     cleanupActiveCore(ctx, env);
+
+    if (ctx->linkBridge) {
+        gba_link_bridge_destroy(ctx->linkBridge);
+        ctx->linkBridge = NULL;
+    }
 
     if (ctx->renderer) {
         egl_renderer_destroy(ctx->renderer);
@@ -522,6 +666,11 @@ Java_com_retro_mgba_core_NativeCore_nativeRunFrame(JNIEnv *env, jobject thiz, jl
     // 1. Run one emulation frame in mGBA
     ctx->core->runFrame(ctx->core);
     ctx->frameCounter++;
+
+    // 1b. Periodic RAM snapshot for Rewind when enabled
+    if (ctx->rewindEnabled && (ctx->frameCounter % REWIND_CAPTURE_INTERVAL) == 0) {
+        _captureRewindSnapshotLocked(ctx);
+    }
 
     // 2. Extract GBA audio samples (for GBA platform)
     if (ctx->core->platform(ctx->core) == mPLATFORM_GBA) {
@@ -1248,4 +1397,243 @@ Java_com_retro_mgba_core_NativeCore_nativeValidateCheatLines(
     mCheatSetDeinit(set);
     mCheatDeviceDestroy(device);
     return (allValid && addedLines > 0) ? JNI_TRUE : JNI_FALSE;
+}
+
+/* ========================================================================== */
+/* GBA Link Cable TCP/IP Network Bridge JNI Exports                           */
+/* ========================================================================== */
+
+JNIEXPORT jboolean JNICALL
+Java_com_retro_mgba_core_NativeCore_nativeLinkStartHost(JNIEnv *env, jobject thiz, jlong handle, jint port) {
+    (void)env;
+    (void)thiz;
+    NativeContext *ctx = (NativeContext *)(intptr_t)handle;
+    if (!ctx || !ctx->linkBridge) return JNI_FALSE;
+
+    gba_link_bridge_signal_stop(ctx->linkBridge);
+    pthread_mutex_lock(&ctx->mutex);
+    bool ok = false;
+    if (ctx->core) {
+        ok = gba_link_bridge_start_host(ctx->linkBridge, ctx->core, (int)port);
+    }
+    pthread_mutex_unlock(&ctx->mutex);
+    return ok ? JNI_TRUE : JNI_FALSE;
+}
+
+JNIEXPORT jboolean JNICALL
+Java_com_retro_mgba_core_NativeCore_nativeLinkConnect(JNIEnv *env, jobject thiz, jlong handle, jstring host, jint port) {
+    (void)thiz;
+    NativeContext *ctx = (NativeContext *)(intptr_t)handle;
+    if (!ctx || !ctx->linkBridge || !host) return JNI_FALSE;
+
+    const char *chost = (*env)->GetStringUTFChars(env, host, NULL);
+    if (!chost) return JNI_FALSE;
+
+    gba_link_bridge_signal_stop(ctx->linkBridge);
+    pthread_mutex_lock(&ctx->mutex);
+    bool ok = false;
+    if (ctx->core) {
+        ok = gba_link_bridge_connect(ctx->linkBridge, ctx->core, chost, (int)port);
+    }
+    pthread_mutex_unlock(&ctx->mutex);
+
+    (*env)->ReleaseStringUTFChars(env, host, chost);
+    return ok ? JNI_TRUE : JNI_FALSE;
+}
+
+JNIEXPORT void JNICALL
+Java_com_retro_mgba_core_NativeCore_nativeLinkDisconnect(JNIEnv *env, jobject thiz, jlong handle) {
+    (void)env;
+    (void)thiz;
+    NativeContext *ctx = (NativeContext *)(intptr_t)handle;
+    if (!ctx || !ctx->linkBridge) return;
+
+    gba_link_bridge_signal_stop(ctx->linkBridge);
+    pthread_mutex_lock(&ctx->mutex);
+    gba_link_bridge_disconnect(ctx->linkBridge);
+    pthread_mutex_unlock(&ctx->mutex);
+}
+
+JNIEXPORT jint JNICALL
+Java_com_retro_mgba_core_NativeCore_nativeLinkGetState(JNIEnv *env, jobject thiz, jlong handle) {
+    (void)env;
+    (void)thiz;
+    NativeContext *ctx = (NativeContext *)(intptr_t)handle;
+    if (!ctx || !ctx->linkBridge) return 0;
+    return (jint)gba_link_bridge_get_state(ctx->linkBridge);
+}
+
+JNIEXPORT jint JNICALL
+Java_com_retro_mgba_core_NativeCore_nativeLinkGetPlayerId(JNIEnv *env, jobject thiz, jlong handle) {
+    (void)env;
+    (void)thiz;
+    NativeContext *ctx = (NativeContext *)(intptr_t)handle;
+    if (!ctx || !ctx->linkBridge) return -1;
+    return (jint)gba_link_bridge_get_player_id(ctx->linkBridge);
+}
+
+JNIEXPORT jint JNICALL
+Java_com_retro_mgba_core_NativeCore_nativeLinkGetPlayerCount(JNIEnv *env, jobject thiz, jlong handle) {
+    (void)env;
+    (void)thiz;
+    NativeContext *ctx = (NativeContext *)(intptr_t)handle;
+    if (!ctx || !ctx->linkBridge) return 1;
+    return (jint)gba_link_bridge_get_player_count(ctx->linkBridge);
+}
+
+JNIEXPORT jint JNICALL
+Java_com_retro_mgba_core_NativeCore_nativeLinkGetPingMs(JNIEnv *env, jobject thiz, jlong handle) {
+    (void)env;
+    (void)thiz;
+    NativeContext *ctx = (NativeContext *)(intptr_t)handle;
+    if (!ctx || !ctx->linkBridge) return -1;
+    return (jint)gba_link_bridge_get_ping_ms(ctx->linkBridge);
+}
+
+JNIEXPORT jboolean JNICALL
+Java_com_retro_mgba_core_NativeCore_nativeLinkIsHost(JNIEnv *env, jobject thiz, jlong handle) {
+    (void)env;
+    (void)thiz;
+    NativeContext *ctx = (NativeContext *)(intptr_t)handle;
+    if (!ctx || !ctx->linkBridge) return JNI_FALSE;
+    return gba_link_bridge_is_host(ctx->linkBridge) ? JNI_TRUE : JNI_FALSE;
+}
+
+JNIEXPORT jstring JNICALL
+Java_com_retro_mgba_core_NativeCore_nativeLinkGetLastError(JNIEnv *env, jobject thiz, jlong handle) {
+    (void)thiz;
+    NativeContext *ctx = (NativeContext *)(intptr_t)handle;
+    if (!ctx || !ctx->linkBridge) return NULL;
+    char buf[160];
+    gba_link_bridge_get_error(ctx->linkBridge, buf, sizeof(buf));
+    if (buf[0] == '\0') return NULL;
+    return (*env)->NewStringUTF(env, buf);
+}
+
+/* ========================================================================== */
+/* Rewind, Soft ROM Patching (IPS/UPS/BPS), and Hardware Sensors              */
+/* ========================================================================== */
+
+JNIEXPORT void JNICALL
+Java_com_retro_mgba_core_NativeCore_nativeSetRewindEnabled(JNIEnv *env, jobject thiz, jlong handle, jboolean enabled) {
+    (void)env;
+    (void)thiz;
+    NativeContext *ctx = (NativeContext *)(intptr_t)handle;
+    if (!ctx) return;
+
+    pthread_mutex_lock(&ctx->mutex);
+    ctx->rewindEnabled = (bool)enabled;
+    if (!ctx->rewindEnabled) {
+        _clearRewindBufferLocked(ctx);
+    }
+    pthread_mutex_unlock(&ctx->mutex);
+}
+
+JNIEXPORT jboolean JNICALL
+Java_com_retro_mgba_core_NativeCore_nativeRewindStep(JNIEnv *env, jobject thiz, jlong handle) {
+    (void)env;
+    (void)thiz;
+    NativeContext *ctx = (NativeContext *)(intptr_t)handle;
+    if (!ctx) return JNI_FALSE;
+
+    pthread_mutex_lock(&ctx->mutex);
+    if (!ctx->core || ctx->rewindCount <= 0) {
+        pthread_mutex_unlock(&ctx->mutex);
+        return JNI_FALSE;
+    }
+
+    ctx->rewindHead = (ctx->rewindHead - 1 + REWIND_MAX_SLOTS) % REWIND_MAX_SLOTS;
+    struct VFile *vf = ctx->rewindSlots[ctx->rewindHead];
+    ctx->rewindSlots[ctx->rewindHead] = NULL;
+    ctx->rewindCount--;
+
+    bool ok = false;
+    if (vf) {
+        vf->seek(vf, 0, SEEK_SET);
+        ok = mCoreLoadStateNamed(ctx->core, vf, SAVESTATE_SAVEDATA | SAVESTATE_RTC);
+        vf->close(vf);
+    }
+
+    if (ok) {
+        if (ctx->audio) {
+            audioEngineReset(ctx->audio);
+        }
+        // Step one frame so the video buffer reflects the rewound state immediately
+        ctx->core->runFrame(ctx->core);
+        if (ctx->renderer) {
+            unsigned w = 0, h = 0;
+            ctx->core->desiredVideoDimensions(ctx->core, &w, &h);
+            if (w == 0 || h == 0) { w = 240; h = 160; }
+            egl_renderer_draw_frame(ctx->renderer, ctx->videoBuffer, (int)w, (int)h, MAX_VIDEO_WIDTH);
+        }
+    }
+
+    pthread_mutex_unlock(&ctx->mutex);
+    return ok ? JNI_TRUE : JNI_FALSE;
+}
+
+JNIEXPORT jboolean JNICALL
+Java_com_retro_mgba_core_NativeCore_nativeLoadPatchPath(JNIEnv *env, jobject thiz, jlong handle, jstring patchPath) {
+    (void)thiz;
+    NativeContext *ctx = (NativeContext *)(intptr_t)handle;
+    if (!ctx || !patchPath) return JNI_FALSE;
+
+    const char *cpath = (*env)->GetStringUTFChars(env, patchPath, NULL);
+    if (!cpath) return JNI_FALSE;
+
+    struct VFile *vf = VFileOpen(cpath, O_RDONLY);
+    (*env)->ReleaseStringUTFChars(env, patchPath, cpath);
+    if (!vf) {
+        LOGE("Failed to open patch file");
+        return JNI_FALSE;
+    }
+
+    pthread_mutex_lock(&ctx->mutex);
+    bool ok = false;
+    if (ctx->core && ctx->core->loadPatch) {
+        ok = ctx->core->loadPatch(ctx->core, vf);
+        if (ok) {
+            _clearRewindBufferLocked(ctx);
+        }
+    }
+    vf->close(vf);
+    pthread_mutex_unlock(&ctx->mutex);
+
+    LOGI("Applied ROM patch: result=%d", (int)ok);
+    return ok ? JNI_TRUE : JNI_FALSE;
+}
+
+JNIEXPORT void JNICALL
+Java_com_retro_mgba_core_NativeCore_nativeSetSensorRotation(JNIEnv *env, jobject thiz, jlong handle, jint tiltX, jint tiltY, jint gyroZ) {
+    (void)env;
+    (void)thiz;
+    NativeContext *ctx = (NativeContext *)(intptr_t)handle;
+    if (!ctx) return;
+    atomic_store(&ctx->sensorTiltX, (int32_t)tiltX);
+    atomic_store(&ctx->sensorTiltY, (int32_t)tiltY);
+    atomic_store(&ctx->sensorGyroZ, (int32_t)gyroZ);
+}
+
+JNIEXPORT void JNICALL
+Java_com_retro_mgba_core_NativeCore_nativeSetSolarLevel(JNIEnv *env, jobject thiz, jlong handle, jint level) {
+    (void)env;
+    (void)thiz;
+    NativeContext *ctx = (NativeContext *)(intptr_t)handle;
+    if (!ctx) return;
+
+    uint8_t lum = 0xFF;
+    if (level >= 1 && level <= 10) {
+        int val = 0xFF - GBA_LUX_LEVELS[level - 1];
+        lum = (uint8_t)(val < 0 ? 0 : val);
+    }
+    atomic_store(&ctx->solarLuminance, lum);
+}
+
+JNIEXPORT jboolean JNICALL
+Java_com_retro_mgba_core_NativeCore_nativeIsRumbleActive(JNIEnv *env, jobject thiz, jlong handle) {
+    (void)env;
+    (void)thiz;
+    NativeContext *ctx = (NativeContext *)(intptr_t)handle;
+    if (!ctx) return JNI_FALSE;
+    return atomic_load(&ctx->rumbleActive) ? JNI_TRUE : JNI_FALSE;
 }

@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
 import coil.compose.AsyncImage
 import com.retro.mgba.core.NativeCore
+import com.retro.mgba.data.covers.BoxArtScraper
 import com.retro.mgba.data.db.AppDatabase
 import com.retro.mgba.data.db.GameEntity
 import com.retro.mgba.data.storage.StorageHelper
@@ -78,8 +79,23 @@ class SettingsActivity : ComponentActivity() {
         const val KEY_CONTROLS_VISIBLE = "controls_visible"
         const val KEY_DPAD_TYPE = "dpad_type"
         const val KEY_CONTROLS_OPACITY = "controls_opacity"
+        const val KEY_CONTROLS_SCALE = "controls_scale"
+        const val KEY_CONSOLE_SKIN = "console_skin"
+        const val KEY_CUSTOM_SHELL_COLOR = "custom_shell_color"
+        const val KEY_CUSTOM_BTN_COLOR = "custom_btn_color"
+        const val KEY_CUSTOM_ACCENT_COLOR = "custom_accent_color"
+        const val KEY_SHOW_QUICK_ACTIONS = "show_quick_actions"
+        const val KEY_TOUCH_HAPTICS = "touch_haptics"
         const val KEY_LAYOUT_PROFILE = "layout_profile"
         const val KEY_AUDIO_ENABLED = "audio_enabled"
+
+        // Emulation & Hardware Sensors
+        const val KEY_FF_SPEED = "ff_speed_multiplier"
+        const val KEY_REWIND_ENABLED = "rewind_enabled"
+        const val KEY_GYRO_ENABLED = "gyro_tilt_enabled"
+        const val KEY_RUMBLE_ENABLED = "cartridge_rumble_enabled"
+        const val KEY_SOLAR_AUTO = "solar_sensor_auto"
+        const val KEY_SOLAR_LEVEL = "solar_sensor_level"
 
         // Gamepad Remapping (Xbox / Switch layout)
         const val KEY_BTN_A = "btn_a"
@@ -97,6 +113,8 @@ class SettingsActivity : ComponentActivity() {
         const val KEY_HOTKEY_SAVE_CODE = "hotkey_save_code"
         const val KEY_HOTKEY_LOAD_CODE = "hotkey_load_code"
         const val KEY_HOTKEY_PAUSE_CODE = "hotkey_pause_code"
+        const val KEY_HOTKEY_FF_CODE = "hotkey_ff_code"
+        const val KEY_HOTKEY_REWIND_CODE = "hotkey_rewind_code"
 
         fun getReadableKeyName(context: Context, keyCode: Int): String = when (keyCode) {
             0 -> context.getString(R.string.key_disabled)
@@ -206,6 +224,7 @@ class SettingsActivity : ComponentActivity() {
 enum class SettingsSubMenu {
     MAIN,
     GRAPHICS,
+    EMULATION,
     CONTROLS,
     SAVES_MANAGER,
     COVERS_MANAGER,
@@ -231,6 +250,7 @@ fun NestedSettingsScreen(
     val topBarTitle = when (currentSubMenu) {
         SettingsSubMenu.MAIN -> stringResource(R.string.btn_settings)
         SettingsSubMenu.GRAPHICS -> stringResource(R.string.menu_graphics)
+        SettingsSubMenu.EMULATION -> stringResource(R.string.menu_emulation)
         SettingsSubMenu.CONTROLS -> stringResource(R.string.menu_controls)
         SettingsSubMenu.SAVES_MANAGER -> stringResource(R.string.menu_saves)
         SettingsSubMenu.COVERS_MANAGER -> stringResource(R.string.menu_covers)
@@ -283,6 +303,9 @@ fun NestedSettingsScreen(
                 SettingsSubMenu.GRAPHICS -> {
                     GraphicsSubMenu(prefs = prefs)
                 }
+                SettingsSubMenu.EMULATION -> {
+                    EmulationSubMenu(prefs = prefs)
+                }
                 SettingsSubMenu.CONTROLS -> {
                     ControlsSubMenu(
                         prefs = prefs,
@@ -333,8 +356,15 @@ fun MainSettingsMenu(onNavigate: (SettingsSubMenu) -> Unit) {
                 )
                 HorizontalDivider(color = SurfaceBorderSubtle)
                 SettingsNavigationRow(
+                    title = stringResource(R.string.menu_emulation),
+                    subtitle = stringResource(R.string.menu_emulation_subtitle),
+                    icon = Icons.Filled.Memory,
+                    onClick = { onNavigate(SettingsSubMenu.EMULATION) }
+                )
+                HorizontalDivider(color = SurfaceBorderSubtle)
+                SettingsNavigationRow(
                     title = stringResource(R.string.menu_controls),
-                    subtitle = stringResource(R.string.touch_controls) + ", " + stringResource(R.string.gamepad_mapping),
+                    subtitle = stringResource(R.string.console_skin_title) + ", " + stringResource(R.string.gamepad_mapping),
                     icon = Icons.Filled.SportsEsports,
                     onClick = { onNavigate(SettingsSubMenu.CONTROLS) }
                 )
@@ -499,6 +529,148 @@ fun GraphicsSubMenu(prefs: SharedPreferences) {
 }
 
 // =============================================================================
+// SUB-MENU 1B: EMULATION & SENSORS
+// =============================================================================
+
+@Composable
+fun EmulationSubMenu(prefs: SharedPreferences) {
+    var ffSpeed by remember { mutableStateOf(prefs.getInt(SettingsActivity.KEY_FF_SPEED, 2).coerceIn(2, 4)) }
+    var rewindEnabled by remember { mutableStateOf(prefs.getBoolean(SettingsActivity.KEY_REWIND_ENABLED, true)) }
+    var gyroEnabled by remember { mutableStateOf(prefs.getBoolean(SettingsActivity.KEY_GYRO_ENABLED, true)) }
+    var rumbleEnabled by remember { mutableStateOf(prefs.getBoolean(SettingsActivity.KEY_RUMBLE_ENABLED, true)) }
+    var solarAuto by remember { mutableStateOf(prefs.getBoolean(SettingsActivity.KEY_SOLAR_AUTO, true)) }
+    var solarLevel by remember { mutableStateOf(prefs.getInt(SettingsActivity.KEY_SOLAR_LEVEL, 5).coerceIn(0, 10)) }
+    var showFfDialog by remember { mutableStateOf(false) }
+
+    val ffSpeedValues = listOf(2, 3, 4)
+    val ffSpeedLabels = listOf("2x", "3x", "4x")
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        // Speed & Time Control
+        SettingsCategoryHeader(title = stringResource(R.string.emu_section_speed), icon = Icons.Filled.FastForward)
+        Card(
+            shape = RoundedCornerShape(12.dp),
+            colors = CardDefaults.cardColors(containerColor = SurfaceCard)
+        ) {
+            Column {
+                SettingsRow(
+                    title = stringResource(R.string.emu_ff_speed),
+                    subtitle = "${ffSpeed}x",
+                    onClick = { showFfDialog = true }
+                )
+                HorizontalDivider(color = SurfaceBorderSubtle)
+                SettingsSwitchRow(
+                    title = stringResource(R.string.emu_rewind_title),
+                    subtitle = stringResource(R.string.emu_rewind_desc),
+                    checked = rewindEnabled,
+                    onCheckedChange = {
+                        rewindEnabled = it
+                        prefs.edit().putBoolean(SettingsActivity.KEY_REWIND_ENABLED, it).apply()
+                    }
+                )
+            }
+        }
+
+        // Hardware Cartridge Sensors
+        SettingsCategoryHeader(title = stringResource(R.string.emu_section_sensors), icon = Icons.Filled.Sensors)
+        Card(
+            shape = RoundedCornerShape(12.dp),
+            colors = CardDefaults.cardColors(containerColor = SurfaceCard)
+        ) {
+            Column {
+                SettingsSwitchRow(
+                    title = stringResource(R.string.emu_gyro_title),
+                    subtitle = stringResource(R.string.emu_gyro_desc),
+                    checked = gyroEnabled,
+                    onCheckedChange = {
+                        gyroEnabled = it
+                        prefs.edit().putBoolean(SettingsActivity.KEY_GYRO_ENABLED, it).apply()
+                    }
+                )
+                HorizontalDivider(color = SurfaceBorderSubtle)
+                SettingsSwitchRow(
+                    title = stringResource(R.string.emu_rumble_title),
+                    subtitle = stringResource(R.string.emu_rumble_desc),
+                    checked = rumbleEnabled,
+                    onCheckedChange = {
+                        rumbleEnabled = it
+                        prefs.edit().putBoolean(SettingsActivity.KEY_RUMBLE_ENABLED, it).apply()
+                    }
+                )
+                HorizontalDivider(color = SurfaceBorderSubtle)
+                SettingsSwitchRow(
+                    title = stringResource(R.string.emu_solar_auto_title),
+                    subtitle = stringResource(R.string.emu_solar_auto_desc),
+                    checked = solarAuto,
+                    onCheckedChange = {
+                        solarAuto = it
+                        prefs.edit().putBoolean(SettingsActivity.KEY_SOLAR_AUTO, it).apply()
+                    }
+                )
+                if (!solarAuto) {
+                    HorizontalDivider(color = SurfaceBorderSubtle)
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                text = stringResource(R.string.emu_solar_manual_level),
+                                color = TextPrimary,
+                                fontSize = 15.sp,
+                                fontWeight = FontWeight.Medium
+                            )
+                            Text(
+                                text = "$solarLevel / 10",
+                                color = FavoriteGold,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 14.sp
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(6.dp))
+                        Slider(
+                            value = solarLevel.toFloat(),
+                            onValueChange = {
+                                val lvl = it.toInt().coerceIn(0, 10)
+                                solarLevel = lvl
+                                prefs.edit().putInt(SettingsActivity.KEY_SOLAR_LEVEL, lvl).apply()
+                            },
+                            valueRange = 0f..10f,
+                            steps = 9,
+                            colors = SliderDefaults.colors(
+                                thumbColor = FavoriteGold,
+                                activeTrackColor = FavoriteGold,
+                                inactiveTrackColor = Color(0xFF262638)
+                            )
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    if (showFfDialog) {
+        SingleChoiceDialog(
+            title = stringResource(R.string.emu_ff_speed),
+            options = ffSpeedLabels,
+            selectedIndex = ffSpeedValues.indexOf(ffSpeed).coerceAtLeast(0),
+            onSelect = { idx ->
+                ffSpeed = ffSpeedValues[idx]
+                prefs.edit().putInt(SettingsActivity.KEY_FF_SPEED, ffSpeed).apply()
+                showFfDialog = false
+            },
+            onDismiss = { showFfDialog = false }
+        )
+    }
+}
+
+// =============================================================================
 // SUB-MENU 2: CONTROLS
 // =============================================================================
 
@@ -510,8 +682,15 @@ fun ControlsSubMenu(
 ) {
     val context = LocalContext.current
     var controlsVisible by remember { mutableStateOf(prefs.getBoolean(SettingsActivity.KEY_CONTROLS_VISIBLE, true)) }
+    var consoleSkin by remember { mutableStateOf(prefs.getInt(SettingsActivity.KEY_CONSOLE_SKIN, TouchOverlayView.SKIN_MODERN_TRANSPARENT)) }
     var dpadType by remember { mutableStateOf(prefs.getInt(SettingsActivity.KEY_DPAD_TYPE, TouchOverlayView.DPAD_TYPE_CLASSIC)) }
+    var showQuickActions by remember { mutableStateOf(prefs.getBoolean(SettingsActivity.KEY_SHOW_QUICK_ACTIONS, true)) }
+    var touchHaptics by remember { mutableStateOf(prefs.getBoolean(SettingsActivity.KEY_TOUCH_HAPTICS, false)) }
     var controlsOpacity by remember { mutableStateOf(prefs.getFloat(SettingsActivity.KEY_CONTROLS_OPACITY, 0.55f)) }
+    var controlsScale by remember { mutableStateOf(prefs.getFloat(SettingsActivity.KEY_CONTROLS_SCALE, 1.0f)) }
+    var customShellColor by remember { mutableIntStateOf(prefs.getInt(SettingsActivity.KEY_CUSTOM_SHELL_COLOR, android.graphics.Color.rgb(34, 24, 62))) }
+    var customBtnColor by remember { mutableIntStateOf(prefs.getInt(SettingsActivity.KEY_CUSTOM_BTN_COLOR, android.graphics.Color.rgb(66, 52, 108))) }
+    var customAccentColor by remember { mutableIntStateOf(prefs.getInt(SettingsActivity.KEY_CUSTOM_ACCENT_COLOR, android.graphics.Color.rgb(139, 92, 246))) }
     var layoutProfile by remember { mutableStateOf(prefs.getInt(SettingsActivity.KEY_LAYOUT_PROFILE, 0)) }
 
     // Gamepad mappings
@@ -530,9 +709,20 @@ fun ControlsSubMenu(
     var hotkeySave by remember { mutableStateOf(prefs.getInt(SettingsActivity.KEY_HOTKEY_SAVE_CODE, KeyEvent.KEYCODE_BUTTON_THUMBL)) }
     var hotkeyLoad by remember { mutableStateOf(prefs.getInt(SettingsActivity.KEY_HOTKEY_LOAD_CODE, KeyEvent.KEYCODE_BUTTON_THUMBR)) }
     var hotkeyPause by remember { mutableStateOf(prefs.getInt(SettingsActivity.KEY_HOTKEY_PAUSE_CODE, 0)) }
+    var hotkeyFf by remember { mutableStateOf(prefs.getInt(SettingsActivity.KEY_HOTKEY_FF_CODE, 0)) }
+    var hotkeyRewind by remember { mutableStateOf(prefs.getInt(SettingsActivity.KEY_HOTKEY_REWIND_CODE, 0)) }
 
+    var showSkinDialog by remember { mutableStateOf(false) }
     var showDpadTypeDialog by remember { mutableStateOf(false) }
     var showProfileDialog by remember { mutableStateOf(false) }
+
+    val skinOptions = listOf(
+        stringResource(R.string.console_skin_modern),
+        stringResource(R.string.console_skin_gba_indigo),
+        stringResource(R.string.console_skin_gba_sp),
+        stringResource(R.string.console_skin_gbc_atomic),
+        stringResource(R.string.console_skin_custom)
+    )
 
     var keyListeningTargetName by remember { mutableStateOf<String?>(null) }
     var keyListeningPrefKey by remember { mutableStateOf<String?>(null) }
@@ -564,9 +754,35 @@ fun ControlsSubMenu(
                 if (controlsVisible) {
                     HorizontalDivider(color = SurfaceBorderSubtle)
                     SettingsRow(
+                        title = stringResource(R.string.console_skin_title),
+                        subtitle = skinOptions.getOrElse(consoleSkin) { skinOptions[0] },
+                        onClick = { showSkinDialog = true }
+                    )
+                    HorizontalDivider(color = SurfaceBorderSubtle)
+                    SettingsRow(
                         title = stringResource(R.string.dpad_style),
                         subtitle = if (dpadType == TouchOverlayView.DPAD_TYPE_STICK) stringResource(R.string.dpad_style_stick) else stringResource(R.string.dpad_style_classic),
                         onClick = { showDpadTypeDialog = true }
+                    )
+                    HorizontalDivider(color = SurfaceBorderSubtle)
+                    SettingsSwitchRow(
+                        title = stringResource(R.string.touch_quick_actions_title),
+                        subtitle = stringResource(R.string.touch_quick_actions_desc),
+                        checked = showQuickActions,
+                        onCheckedChange = {
+                            showQuickActions = it
+                            prefs.edit().putBoolean(SettingsActivity.KEY_SHOW_QUICK_ACTIONS, it).apply()
+                        }
+                    )
+                    HorizontalDivider(color = SurfaceBorderSubtle)
+                    SettingsSwitchRow(
+                        title = stringResource(R.string.touch_haptics_title),
+                        subtitle = stringResource(R.string.touch_haptics_desc),
+                        checked = touchHaptics,
+                        onCheckedChange = {
+                            touchHaptics = it
+                            prefs.edit().putBoolean(SettingsActivity.KEY_TOUCH_HAPTICS, it).apply()
+                        }
                     )
                     HorizontalDivider(color = SurfaceBorderSubtle)
                     Column(modifier = Modifier.padding(16.dp)) {
@@ -600,6 +816,60 @@ fun ControlsSubMenu(
                                 activeTrackColor = AccentPrimary,
                                 inactiveTrackColor = Color(0xFF262638)
                             )
+                        )
+
+                        Spacer(modifier = Modifier.height(10.dp))
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                text = stringResource(R.string.button_size),
+                                color = TextPrimary,
+                                fontSize = 15.sp,
+                                fontWeight = FontWeight.Medium
+                            )
+                            Text(
+                                text = "${(controlsScale * 100).toInt()}%",
+                                color = AccentPrimary,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 14.sp
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Slider(
+                            value = controlsScale,
+                            onValueChange = {
+                                controlsScale = it
+                                prefs.edit().putFloat(SettingsActivity.KEY_CONTROLS_SCALE, it).apply()
+                            },
+                            valueRange = 0.8f..1.3f,
+                            colors = SliderDefaults.colors(
+                                thumbColor = AccentPrimary,
+                                activeTrackColor = AccentPrimary,
+                                inactiveTrackColor = Color(0xFF262638)
+                            )
+                        )
+                    }
+
+                    if (consoleSkin == TouchOverlayView.SKIN_CUSTOM) {
+                        HorizontalDivider(color = SurfaceBorderSubtle)
+                        CustomSkinPaletteEditor(
+                            shellColor = customShellColor,
+                            buttonColor = customBtnColor,
+                            accentColor = customAccentColor,
+                            onShellChange = { c ->
+                                customShellColor = c
+                                prefs.edit().putInt(SettingsActivity.KEY_CUSTOM_SHELL_COLOR, c).apply()
+                            },
+                            onButtonChange = { c ->
+                                customBtnColor = c
+                                prefs.edit().putInt(SettingsActivity.KEY_CUSTOM_BTN_COLOR, c).apply()
+                            },
+                            onAccentChange = { c ->
+                                customAccentColor = c
+                                prefs.edit().putInt(SettingsActivity.KEY_CUSTOM_ACCENT_COLOR, c).apply()
+                            }
                         )
                     }
                 }
@@ -713,6 +983,8 @@ fun ControlsSubMenu(
                     Triple(stringResource(R.string.quick_save), SettingsActivity.KEY_HOTKEY_SAVE_CODE, hotkeySave),
                     Triple(stringResource(R.string.quick_load), SettingsActivity.KEY_HOTKEY_LOAD_CODE, hotkeyLoad),
                     Triple(stringResource(R.string.pause_menu), SettingsActivity.KEY_HOTKEY_PAUSE_CODE, hotkeyPause),
+                    Triple(stringResource(R.string.hotkey_fast_forward), SettingsActivity.KEY_HOTKEY_FF_CODE, hotkeyFf),
+                    Triple(stringResource(R.string.hotkey_rewind), SettingsActivity.KEY_HOTKEY_REWIND_CODE, hotkeyRewind),
                 )
 
                 hotkeyRows.forEachIndexed { index, (label, key, currentVal) ->
@@ -728,6 +1000,8 @@ fun ControlsSubMenu(
                                     SettingsActivity.KEY_HOTKEY_SAVE_CODE -> hotkeySave = capturedCode
                                     SettingsActivity.KEY_HOTKEY_LOAD_CODE -> hotkeyLoad = capturedCode
                                     SettingsActivity.KEY_HOTKEY_PAUSE_CODE -> hotkeyPause = capturedCode
+                                    SettingsActivity.KEY_HOTKEY_FF_CODE -> hotkeyFf = capturedCode
+                                    SettingsActivity.KEY_HOTKEY_REWIND_CODE -> hotkeyRewind = capturedCode
                                 }
                                 keyListeningTargetName = null
                                 keyListeningPrefKey = null
@@ -742,6 +1016,20 @@ fun ControlsSubMenu(
         }
 
         Spacer(modifier = Modifier.height(24.dp))
+    }
+
+    if (showSkinDialog) {
+        SingleChoiceDialog(
+            title = stringResource(R.string.console_skin_title),
+            options = skinOptions,
+            selectedIndex = consoleSkin.coerceIn(0, skinOptions.lastIndex),
+            onSelect = {
+                consoleSkin = it
+                prefs.edit().putInt(SettingsActivity.KEY_CONSOLE_SKIN, it).apply()
+                showSkinDialog = false
+            },
+            onDismiss = { showSkinDialog = false }
+        )
     }
 
     if (showDpadTypeDialog) {
@@ -877,6 +1165,8 @@ fun ControlsSubMenu(
                                             SettingsActivity.KEY_HOTKEY_SAVE_CODE -> hotkeySave = code
                                             SettingsActivity.KEY_HOTKEY_LOAD_CODE -> hotkeyLoad = code
                                             SettingsActivity.KEY_HOTKEY_PAUSE_CODE -> hotkeyPause = code
+                                            SettingsActivity.KEY_HOTKEY_FF_CODE -> hotkeyFf = code
+                                            SettingsActivity.KEY_HOTKEY_REWIND_CODE -> hotkeyRewind = code
                                         }
                                         onCancelKeyCapture()
                                         keyListeningTargetName = null
@@ -919,6 +1209,8 @@ fun ControlsSubMenu(
                                     SettingsActivity.KEY_HOTKEY_SAVE_CODE -> hotkeySave = 0
                                     SettingsActivity.KEY_HOTKEY_LOAD_CODE -> hotkeyLoad = 0
                                     SettingsActivity.KEY_HOTKEY_PAUSE_CODE -> hotkeyPause = 0
+                                    SettingsActivity.KEY_HOTKEY_FF_CODE -> hotkeyFf = 0
+                                    SettingsActivity.KEY_HOTKEY_REWIND_CODE -> hotkeyRewind = 0
                                 }
                                 onCancelKeyCapture()
                                 keyListeningTargetName = null
@@ -1276,31 +1568,86 @@ fun CoversManagerSubMenu(context: Context) {
     }
 
     val coversPath = remember { StorageHelper.getCoversDir(context).absolutePath }
+    var isScraping by remember { mutableStateOf(false) }
+    var scrapeProgress by remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
-        // Path Card
+        // Path Card + One-Tap Auto-Download Covers
         Card(
             shape = RoundedCornerShape(12.dp),
             colors = CardDefaults.cardColors(containerColor = SurfaceCard),
             modifier = Modifier.fillMaxWidth()
         ) {
-            Column(modifier = Modifier.padding(14.dp)) {
-                Text(
-                    text = stringResource(R.string.covers_data_folder),
-                    color = TextSecondary,
-                    fontSize = 12.sp
-                )
-                Spacer(modifier = Modifier.height(2.dp))
-                Text(
-                    text = coversPath,
-                    color = AccentPrimary,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Medium
-                )
+            Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Column {
+                    Text(
+                        text = stringResource(R.string.covers_data_folder),
+                        color = TextSecondary,
+                        fontSize = 12.sp
+                    )
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = coversPath,
+                        color = AccentPrimary,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+
+                Button(
+                    onClick = {
+                        if (isScraping) return@Button
+                        val missing = gamesList.filter { it.customCoverUri.isNullOrBlank() }
+                        if (missing.isEmpty()) {
+                            Toast.makeText(context, context.getString(R.string.covers_auto_none_missing), Toast.LENGTH_SHORT).show()
+                            return@Button
+                        }
+                        isScraping = true
+                        coroutineScope.launch {
+                            var downloaded = 0
+                            missing.forEachIndexed { idx, g ->
+                                scrapeProgress = context.getString(R.string.covers_auto_progress, idx + 1, missing.size)
+                                val savedUri = BoxArtScraper.fetchCoverForGame(context, g)
+                                if (savedUri != null) {
+                                    withContext(Dispatchers.IO) {
+                                        db.gameDao().update(g.copy(customCoverUri = savedUri))
+                                    }
+                                    downloaded++
+                                }
+                            }
+                            isScraping = false
+                            scrapeProgress = ""
+                            refreshGames()
+                            Toast.makeText(
+                                context,
+                                context.getString(R.string.covers_auto_done, downloaded, missing.size),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    },
+                    enabled = !isScraping && gamesList.isNotEmpty(),
+                    colors = ButtonDefaults.buttonColors(containerColor = AccentPrimary),
+                    shape = RoundedCornerShape(10.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    if (isScraping) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(16.dp),
+                            color = Color.White,
+                            strokeWidth = 2.dp
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(text = scrapeProgress, fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
+                    } else {
+                        Icon(Icons.Filled.AutoAwesome, contentDescription = null, modifier = Modifier.size(18.dp))
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(text = stringResource(R.string.covers_auto_download), fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
+                    }
+                }
             }
         }
 
@@ -1884,4 +2231,240 @@ fun SingleChoiceDialog(
             }
         }
     )
+}
+
+@Composable
+fun CustomSkinPaletteEditor(
+    shellColor: Int,
+    buttonColor: Int,
+    accentColor: Int,
+    onShellChange: (Int) -> Unit,
+    onButtonChange: (Int) -> Unit,
+    onAccentChange: (Int) -> Unit
+) {
+    val context = LocalContext.current
+
+    val shellSwatches = listOf(
+        0xFF22183E.toInt(), // Deep Violet
+        0xFF1A1D26.toInt(), // Obsidian Slate
+        0xFF153243.toInt(), // Midnight Teal
+        0xFF3E1929.toInt(), // Crimson Wine
+        0xFF183626.toInt(), // Forest Emerald
+        0xFF3B2C1A.toInt(), // Retro Bronze
+        0xFF2E3440.toInt()  // Nord Grey
+    )
+    val buttonSwatches = listOf(
+        0xFF42346C.toInt(),
+        0xFF2D3140.toInt(),
+        0xFF244E66.toInt(),
+        0xFF6B2344.toInt(),
+        0xFF25543A.toInt(),
+        0xFF5C4327.toInt(),
+        0xFF4C566A.toInt()
+    )
+    val accentSwatches = listOf(
+        0xFF8B5CF6.toInt(), // Electric Violet
+        0xFF06B6D4.toInt(), // GBC Cyan
+        0xFF10B981.toInt(), // Emerald
+        0xFFEC4899.toInt(), // Neon Pink
+        0xFFF59E0B.toInt(), // Amber Gold
+        0xFFEF4444.toInt(), // Crimson Red
+        0xFF84CC16.toInt()  // DMG Lime
+    )
+
+    fun toHex(c: Int): String = String.format("#%06X", 0xFFFFFF and c)
+    val themeCode = "${toHex(shellColor)},${toHex(buttonColor)},${toHex(accentColor)}"
+
+    var showCodeDialog by remember { mutableStateOf(false) }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        SwatchRow(
+            label = stringResource(R.string.custom_skin_shell_color),
+            swatches = shellSwatches,
+            selected = shellColor,
+            onSelect = onShellChange
+        )
+        SwatchRow(
+            label = stringResource(R.string.custom_skin_button_color),
+            swatches = buttonSwatches,
+            selected = buttonColor,
+            onSelect = onButtonChange
+        )
+        SwatchRow(
+            label = stringResource(R.string.custom_skin_accent_color),
+            swatches = accentSwatches,
+            selected = accentColor,
+            onSelect = onAccentChange
+        )
+
+        // Shareable / editable Hex Theme Code (#SHELL,#BTN,#ACCENT)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(10.dp))
+                .background(SurfaceLowest)
+                .padding(horizontal = 12.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = stringResource(R.string.custom_skin_code_label),
+                    color = TextSecondary,
+                    fontSize = 11.sp
+                )
+                Text(
+                    text = themeCode,
+                    color = GbcCyan,
+                    fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
+                    fontSize = 12.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                IconButton(
+                    onClick = {
+                        val cm = context.getSystemService(Context.CLIPBOARD_SERVICE) as? android.content.ClipboardManager
+                        cm?.setPrimaryClip(android.content.ClipData.newPlainText("mGBA Skin Code", themeCode))
+                        Toast.makeText(context, context.getString(R.string.custom_skin_code_copied), Toast.LENGTH_SHORT).show()
+                    },
+                    modifier = Modifier.size(34.dp)
+                ) {
+                    Icon(Icons.Filled.ContentCopy, contentDescription = null, tint = AccentGlow, modifier = Modifier.size(18.dp))
+                }
+                IconButton(
+                    onClick = { showCodeDialog = true },
+                    modifier = Modifier.size(34.dp)
+                ) {
+                    Icon(Icons.Filled.Edit, contentDescription = null, tint = TextSecondary, modifier = Modifier.size(18.dp))
+                }
+            }
+        }
+    }
+
+    if (showCodeDialog) {
+        var inputCode by remember { mutableStateOf(themeCode) }
+        var parseError by remember { mutableStateOf(false) }
+
+        AlertDialog(
+            onDismissRequest = { showCodeDialog = false },
+            containerColor = SurfaceElevated,
+            title = {
+                Text(
+                    text = stringResource(R.string.custom_skin_code_dialog_title),
+                    color = TextPrimary,
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        text = stringResource(R.string.custom_skin_code_hint),
+                        color = TextSecondary,
+                        fontSize = 12.sp
+                    )
+                    OutlinedTextField(
+                        value = inputCode,
+                        onValueChange = {
+                            inputCode = it
+                            parseError = false
+                        },
+                        singleLine = true,
+                        isError = parseError,
+                        textStyle = androidx.compose.ui.text.TextStyle(
+                            fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
+                            color = GbcCyan,
+                            fontSize = 13.sp
+                        ),
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(10.dp)
+                    )
+                    if (parseError) {
+                        Text(
+                            text = stringResource(R.string.custom_skin_code_invalid),
+                            color = DestructiveRed,
+                            fontSize = 12.sp
+                        )
+                    }
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        val parts = inputCode.split(',').map { it.trim() }
+                        if (parts.size == 3) {
+                            try {
+                                val c1 = android.graphics.Color.parseColor(parts[0])
+                                val c2 = android.graphics.Color.parseColor(parts[1])
+                                val c3 = android.graphics.Color.parseColor(parts[2])
+                                onShellChange(c1)
+                                onButtonChange(c2)
+                                onAccentChange(c3)
+                                showCodeDialog = false
+                                return@Button
+                            } catch (_: Exception) {
+                            }
+                        }
+                        parseError = true
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = AccentPrimary)
+                ) {
+                    Text(stringResource(R.string.cheats_save))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showCodeDialog = false }) {
+                    Text(stringResource(R.string.cancel), color = TextSecondary)
+                }
+            }
+        )
+    }
+}
+
+@Composable
+private fun SwatchRow(
+    label: String,
+    swatches: List<Int>,
+    selected: Int,
+    onSelect: (Int) -> Unit
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Text(text = label, color = TextSecondary, fontSize = 12.sp, fontWeight = FontWeight.Medium)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            swatches.forEach { argb ->
+                val isSelected = (argb and 0xFFFFFF) == (selected and 0xFFFFFF)
+                Box(
+                    modifier = Modifier
+                        .size(30.dp)
+                        .clip(androidx.compose.foundation.shape.CircleShape)
+                        .background(Color(argb))
+                        .clickable { onSelect(argb) }
+                        .then(
+                            if (isSelected) {
+                                Modifier.padding(2.dp)
+                            } else Modifier
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (isSelected) {
+                        Icon(
+                            imageVector = Icons.Filled.Check,
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
+                }
+            }
+        }
+    }
 }

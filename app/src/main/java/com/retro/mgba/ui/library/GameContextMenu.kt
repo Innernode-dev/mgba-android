@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.Info
@@ -56,6 +57,9 @@ fun GameContextMenu(
     onAssignCover: () -> Unit,
     onRemoveCover: () -> Unit,
     onOpenCheats: () -> Unit,
+    hasRomPatch: Boolean = false,
+    onAssignPatch: () -> Unit = {},
+    onRemovePatch: () -> Unit = {},
     onOpenDetails: () -> Unit,
     onRemove: () -> Unit
 ) {
@@ -141,6 +145,36 @@ fun GameContextMenu(
                 onOpenCheats()
             }
         )
+
+        // Apply / Replace Soft ROM Patch (.ips / .ups / .bps)
+        DropdownMenuItem(
+            text = {
+                Text(
+                    text = if (hasRomPatch) stringResource(R.string.action_replace_patch) else stringResource(R.string.action_apply_patch),
+                    color = TextPrimary
+                )
+            },
+            leadingIcon = {
+                Icon(Icons.Filled.Build, contentDescription = null, tint = Color(0xFF10B981))
+            },
+            onClick = {
+                onDismiss()
+                onAssignPatch()
+            }
+        )
+
+        if (hasRomPatch) {
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.action_remove_patch), color = TextSecondary) },
+                leadingIcon = {
+                    Icon(Icons.Filled.DeleteOutline, contentDescription = null, tint = TextMuted)
+                },
+                onClick = {
+                    onDismiss()
+                    onRemovePatch()
+                }
+            )
+        }
 
         // Game Details
         DropdownMenuItem(

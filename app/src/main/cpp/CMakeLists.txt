@@ -45,11 +45,12 @@ set(SKIP_GIT ON CACHE BOOL "Skip git version query" FORCE)
 # Add upstream mGBA core subdirectory
 add_subdirectory(mgba)
 
-# Define JNI Bridge shared library with video renderer and audio engine
+# Define JNI Bridge shared library with video renderer, audio engine, and link cable bridge
 add_library(mgba_jni SHARED
     mgba_jni.c
     video/egl_renderer.cpp
     audio/oboe_audio.cpp
+    net/gba_link_bridge.c
 )
 
 # Exported and internal headers
@@ -57,6 +58,7 @@ target_include_directories(mgba_jni PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/video
     ${CMAKE_CURRENT_SOURCE_DIR}/audio
+    ${CMAKE_CURRENT_SOURCE_DIR}/net
     ${CMAKE_CURRENT_SOURCE_DIR}/mgba/include
     ${CMAKE_CURRENT_BINARY_DIR}/mgba/include
 )

@@ -56,6 +56,8 @@ fun LibraryScreen(
     onAssignCustomCover: (GameEntity, Uri) -> Unit,
     onRemoveCustomCover: (GameEntity) -> Unit,
     onOpenCheats: (GameEntity) -> Unit,
+    onAssignRomPatch: (GameEntity, Uri) -> Unit = { _, _ -> },
+    onRemoveRomPatch: (GameEntity) -> Unit = {},
     onDeleteGame: (GameEntity) -> Unit,
     onShowDetails: (GameEntity) -> Unit,
     onDismissDetails: () -> Unit,
@@ -65,6 +67,20 @@ fun LibraryScreen(
 ) {
     val context = LocalContext.current
     var pendingCoverGameUri by rememberSaveable { mutableStateOf<String?>(null) }
+    var pendingPatchGameUri by rememberSaveable { mutableStateOf<String?>(null) }
+
+    val patchPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument()
+    ) { patchUri: Uri? ->
+        val targetUri = pendingPatchGameUri
+        pendingPatchGameUri = null
+        if (patchUri != null && targetUri != null) {
+            val game = state.games.firstOrNull { it.uri == targetUri }
+            if (game != null) {
+                onAssignRomPatch(game, patchUri)
+            }
+        }
+    }
 
     // SAF Directory Picker Launcher for adding ROM directories
     val folderPickerLauncher = rememberLauncherForActivityResult(
@@ -159,6 +175,8 @@ fun LibraryScreen(
 
                         // Long-Press Context Menu anchored to Card
                         if (state.activeGameContextMenu?.uri == game.uri) {
+                            val sanitizedTitle = com.retro.mgba.data.cheats.CheatRepository.sanitizeGameTitle(game.title)
+                            val hasPatch = com.retro.mgba.data.storage.StorageHelper.findRomPatch(context, sanitizedTitle) != null
                             GameContextMenu(
                                 game = game,
                                 expanded = true,
@@ -171,6 +189,12 @@ fun LibraryScreen(
                                 },
                                 onRemoveCover = { onRemoveCustomCover(game) },
                                 onOpenCheats = { onOpenCheats(game) },
+                                hasRomPatch = hasPatch,
+                                onAssignPatch = {
+                                    pendingPatchGameUri = game.uri
+                                    patchPickerLauncher.launch(arrayOf("*/*"))
+                                },
+                                onRemovePatch = { onRemoveRomPatch(game) },
                                 onOpenDetails = { onShowDetails(game) },
                                 onRemove = { onDeleteGame(game) }
                             )

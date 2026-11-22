@@ -104,6 +104,20 @@ class MainActivity : ComponentActivity() {
                         }
                         startActivity(intent)
                     },
+                    onAssignRomPatch = { game, patchUri ->
+                        val key = com.retro.mgba.data.cheats.CheatRepository.sanitizeGameTitle(game.title)
+                        val saved = com.retro.mgba.data.storage.StorageHelper.saveRomPatch(applicationContext, key, patchUri)
+                        if (saved != null) {
+                            android.widget.Toast.makeText(this@MainActivity, getString(R.string.toast_patch_saved, saved.name), android.widget.Toast.LENGTH_SHORT).show()
+                        } else {
+                            android.widget.Toast.makeText(this@MainActivity, getString(R.string.toast_patch_error), android.widget.Toast.LENGTH_SHORT).show()
+                        }
+                    },
+                    onRemoveRomPatch = { game ->
+                        val key = com.retro.mgba.data.cheats.CheatRepository.sanitizeGameTitle(game.title)
+                        com.retro.mgba.data.storage.StorageHelper.deleteRomPatch(applicationContext, key)
+                        android.widget.Toast.makeText(this@MainActivity, getString(R.string.toast_patch_removed), android.widget.Toast.LENGTH_SHORT).show()
+                    },
                     onDeleteGame = { viewModel.onDeleteGame(it) },
                     onShowDetails = { viewModel.onShowDetails(it) },
                     onDismissDetails = { viewModel.onDismissDetails() },

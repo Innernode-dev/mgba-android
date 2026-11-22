@@ -5,9 +5,16 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.res.Configuration
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.os.VibratorManager
 import android.view.InputDevice
 import android.view.KeyEvent
 import android.view.MotionEvent
@@ -18,6 +25,9 @@ import android.view.WindowManager
 import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -25,6 +35,8 @@ import com.retro.mgba.core.NativeCore
 import com.retro.mgba.data.cheats.CheatRepository
 import com.retro.mgba.data.storage.StorageHelper
 import com.retro.mgba.overlay.TouchOverlayView
+import com.retro.mgba.ui.link.LinkCableRootOverlay
+import com.retro.mgba.ui.theme.RetroMgbaTheme
 import java.io.File
 import kotlin.concurrent.thread
 
@@ -43,7 +55,7 @@ import kotlin.concurrent.thread
  * - Touch virtual overlay with 8-way cross D-Pad OR virtual stick ("колёсико"), zero vibration.
  * - In-Game Pause dialog with Quick Save/Load, Settings shortcut, and clean exit.
  */
-class EmulationActivity : ComponentActivity(), SurfaceHolder.Callback {
+class EmulationActivity : ComponentActivity(), SurfaceHolder.Callback, SensorEventListener {
 
     override fun attachBaseContext(newBase: Context) {
         super.attachBaseContext(com.retro.mgba.util.LocaleHelper.applyLocale(newBase))
@@ -54,6 +66,24 @@ class EmulationActivity : ComponentActivity(), SurfaceHolder.Callback {
     @Volatile private var running = false
     @Volatile private var surfaceReady = false
     @Volatile private var isPausedByMenu = false
+    @Volatile private var fastForwardActive = false
+    @Volatile private var rewinding = false
+    private val linkDialogVisible = mutableStateOf(false)
+    private val isGbaPlatformState = mutableStateOf(true)
+
+    // Hardware Sensors & Rumble
+    private var sensorManager: SensorManager? = null
+    private var vibrator: Vibrator? = null
+    private var ffSpeedMultiplier = 2
+    private var rewindEnabled = true
+    private var gyroEnabled = true
+    private var rumbleEnabled = true
+    private var solarAuto = true
+    private var solarManualLevel = 5
+    @Volatile private var latestTiltX = 0
+    @Volatile private var latestTiltY = 0
+    @Volatile private var latestGyroZ = 0
+    private var lastRumbleState = false
 
     private lateinit var surfaceView: SurfaceView
     private lateinit var overlayView: TouchOverlayView
@@ -89,12 +119,21 @@ class EmulationActivity : ComponentActivity(), SurfaceHolder.Callback {
     private var hotkeySave = KeyEvent.KEYCODE_BUTTON_THUMBL
     private var hotkeyLoad = KeyEvent.KEYCODE_BUTTON_THUMBR
     private var hotkeyPause = 0
+    private var hotkeyFf = 0
+    private var hotkeyRewind = 0
     private var layoutProfile = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         prefs = getSharedPreferences(SettingsActivity.PREFS_NAME, Context.MODE_PRIVATE)
+        sensorManager = getSystemService(Context.SENSOR_SERVICE) as? SensorManager
+        vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            (getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as? VibratorManager)?.defaultVibrator
+        } else {
+            @Suppress("DEPRECATION")
+            getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
+        }
 
         // 1. Display cutout support: draw under camera notches so screen is symmetrically centered
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
@@ -139,11 +178,37 @@ class EmulationActivity : ComponentActivity(), SurfaceHolder.Callback {
             overlay.onMenuClick = {
                 showPauseMenu()
             }
+            overlay.onFastForwardToggle = { active ->
+                setFastForwardState(active)
+            }
+            overlay.onRewindStateChanged = { active ->
+                rewinding = active && rewindEnabled
+            }
             root.addView(overlay, FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT,
                 FrameLayout.LayoutParams.MATCH_PARENT
             ))
         }
+
+        // Compose overlay layer for Link Cable HUD pill & live modal dialog
+        val linkComposeView = ComposeView(this).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                RetroMgbaTheme {
+                    LinkCableRootOverlay(
+                        core = core,
+                        isGbaPlatform = isGbaPlatformState.value,
+                        dialogVisible = linkDialogVisible.value,
+                        onOpenDialog = { openLinkDialog() },
+                        onCloseDialog = { closeLinkDialog() }
+                    )
+                }
+            }
+        }
+        root.addView(linkComposeView, FrameLayout.LayoutParams(
+            FrameLayout.LayoutParams.MATCH_PARENT,
+            FrameLayout.LayoutParams.MATCH_PARENT
+        ))
 
         setContentView(root)
         surfaceView.holder.addCallback(this)
@@ -207,10 +272,24 @@ class EmulationActivity : ComponentActivity(), SurfaceHolder.Callback {
             core.destroy(); finish(); return
         }
 
+        // Apply on-the-fly ROM patch (.bps / .ups / .ips) if attached to this game
+        val patchFile = StorageHelper.findRomPatch(this, sanitizedGameTitle)
+        if (patchFile != null) {
+            val patched = core.loadPatchPath(patchFile.absolutePath)
+            if (patched) {
+                Toast.makeText(this, getString(R.string.toast_patch_applied, patchFile.name), Toast.LENGTH_SHORT).show()
+            }
+        }
+
         // Hardware reset first, then bind & restore SRAM so reset doesn't overwrite loaded battery save
         core.reset()
         core.setSramPath(sramFilePath)
+        core.setRewindEnabled(rewindEnabled)
+        if (!solarAuto) {
+            core.setSolarLevel(solarManualLevel)
+        }
         syncGameCheats()
+        isGbaPlatformState.value = (core.getPlatform() == NativeCore.PLATFORM_GBA)
 
         surfaceReady = true
         resumeEmulationThread()
@@ -257,17 +336,44 @@ class EmulationActivity : ComponentActivity(), SurfaceHolder.Callback {
 
         while (running) {
             if (!surfaceReady || isPausedByMenu) {
+                if (lastRumbleState) {
+                    lastRumbleState = false
+                    vibrator?.cancel()
+                }
                 try { Thread.sleep(12) } catch (_: InterruptedException) { break }
                 nextFrameTime = System.nanoTime()
                 continue
             }
 
+            if (rewinding && rewindEnabled) {
+                core.rewindStep()
+                try { Thread.sleep(85) } catch (_: InterruptedException) { break }
+                nextFrameTime = System.nanoTime()
+                continue
+            }
+
             val now = System.nanoTime()
-            if (now >= nextFrameTime) {
+            if (fastForwardActive || now >= nextFrameTime) {
                 core.runFrame()
-                nextFrameTime += frameNanos
-                if (now - nextFrameTime > frameNanos * 3) {
-                    nextFrameTime = now + frameNanos
+                if (fastForwardActive) {
+                    nextFrameTime = now
+                } else {
+                    nextFrameTime += frameNanos
+                    if (now - nextFrameTime > frameNanos * 3) {
+                        nextFrameTime = now + frameNanos
+                    }
+                }
+
+                // Drive phone vibrator when cartridge requests Rumble
+                if (rumbleEnabled) {
+                    val rumbleNow = core.isRumbleActive()
+                    if (rumbleNow != lastRumbleState) {
+                        lastRumbleState = rumbleNow
+                        updateRumbleHardware(rumbleNow)
+                    }
+                } else if (lastRumbleState) {
+                    lastRumbleState = false
+                    vibrator?.cancel()
                 }
 
                 // Periodic battery SRAM flush (every 1.5 seconds if marked dirty by game)
@@ -287,6 +393,34 @@ class EmulationActivity : ComponentActivity(), SurfaceHolder.Callback {
         }
     }
 
+    private fun setFastForwardState(active: Boolean) {
+        fastForwardActive = active
+        if (::overlayView.isInitialized) {
+            overlayView.isFastForwardActive = active
+        }
+        if (core.handle != 0L) {
+            core.setFastForward(if (active) ffSpeedMultiplier.toFloat() else 1.0f)
+        }
+    }
+
+    private fun updateRumbleHardware(active: Boolean) {
+        val vib = vibrator ?: return
+        if (!vib.hasVibrator()) return
+        try {
+            if (active) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    vib.vibrate(VibrationEffect.createOneShot(180L, VibrationEffect.DEFAULT_AMPLITUDE))
+                } else {
+                    @Suppress("DEPRECATION")
+                    vib.vibrate(180L)
+                }
+            } else {
+                vib.cancel()
+            }
+        } catch (_: Exception) {
+        }
+    }
+
     // --- Input Subsystem ---
 
     private fun pushKeys() {
@@ -298,6 +432,14 @@ class EmulationActivity : ComponentActivity(), SurfaceHolder.Callback {
      * Guarantees 0 ms latency without Android UI focus overhead.
      */
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+        if (linkDialogVisible.value) {
+            if (event.keyCode == KeyEvent.KEYCODE_BACK && event.action == KeyEvent.ACTION_UP) {
+                closeLinkDialog()
+                return true
+            }
+            return super.dispatchKeyEvent(event)
+        }
+
         val keyCode = event.keyCode
 
         // 1. Pause Menu (Back Key or Configured Pause Hotkey)
@@ -322,6 +464,23 @@ class EmulationActivity : ComponentActivity(), SurfaceHolder.Callback {
             if (event.action == KeyEvent.ACTION_DOWN) {
                 val ok = core.loadState(0, stateDirPath)
                 Toast.makeText(this, if (ok) getString(R.string.toast_state_loaded) else getString(R.string.toast_state_slot_empty), Toast.LENGTH_SHORT).show()
+            }
+            return true
+        }
+
+        // 3b. Hotkey: Fast Forward Toggle
+        if (hotkeyFf != 0 && keyCode == hotkeyFf) {
+            if (event.action == KeyEvent.ACTION_DOWN && event.repeatCount == 0) {
+                setFastForwardState(!fastForwardActive)
+            }
+            return true
+        }
+
+        // 3c. Hotkey: Rewind Hold
+        if (hotkeyRewind != 0 && keyCode == hotkeyRewind) {
+            when (event.action) {
+                KeyEvent.ACTION_DOWN -> rewinding = rewindEnabled
+                KeyEvent.ACTION_UP -> rewinding = false
             }
             return true
         }
@@ -406,6 +565,20 @@ class EmulationActivity : ComponentActivity(), SurfaceHolder.Callback {
         return true
     }
 
+    private fun openLinkDialog() {
+        isPausedByMenu = true
+        if (::overlayView.isInitialized) {
+            overlayView.clearAllKeys()
+        }
+        linkDialogVisible.value = true
+    }
+
+    private fun closeLinkDialog() {
+        linkDialogVisible.value = false
+        isPausedByMenu = false
+        applyImmersiveFullscreen()
+    }
+
     // --- In-Game Pause & Settings Menu ---
 
     private fun showPauseMenu() {
@@ -420,11 +593,20 @@ class EmulationActivity : ComponentActivity(), SurfaceHolder.Callback {
             getString(R.string.pause_cheats)
         }
 
+        val linkStatus = core.getLinkStatus()
+        val linkLabel = when (linkStatus.state) {
+            NativeCore.LINK_STATE_CONNECTED -> getString(R.string.pause_link_connected, linkStatus.playerCount)
+            NativeCore.LINK_STATE_HOSTING -> getString(R.string.pause_link_hosting)
+            NativeCore.LINK_STATE_CONNECTING -> getString(R.string.pause_link_connecting)
+            else -> getString(R.string.pause_link_cable)
+        }
+
         val items = arrayOf(
             getString(R.string.pause_resume),
             getString(R.string.pause_quick_save),
             getString(R.string.pause_quick_load),
             cheatsLabel,
+            linkLabel,
             getString(R.string.pause_settings),
             getString(R.string.pause_save_and_exit)
         )
@@ -459,11 +641,15 @@ class EmulationActivity : ComponentActivity(), SurfaceHolder.Callback {
                         }
                         startActivity(cheatsIntent)
                     }
-                    4 -> { // Open Settings Screen
+                    4 -> { // Open Link Cable Network Bridge
+                        openLinkDialog()
+                    }
+                    5 -> { // Open Settings Screen
                         isPausedByMenu = true
                         startActivity(Intent(this@EmulationActivity, SettingsActivity::class.java))
                     }
-                    5 -> { // Save and Exit cleanly back to library
+                    6 -> { // Save and Exit cleanly back to library
+                        core.disconnectLink()
                         core.saveState(0, stateDirPath)
                         core.flushSram(sramFilePath)
                         finish()
@@ -492,12 +678,37 @@ class EmulationActivity : ComponentActivity(), SurfaceHolder.Callback {
             core.setShaderFilter(currentShaderFilter)
         }
 
-        // 3. Touch Overlay Visibility, D-Pad Type & Opacity
+        // 3. Touch Overlay Visibility, Console Skin, D-Pad Type, Quick Actions, Haptics, Scale & Opacity
         if (::overlayView.isInitialized) {
             overlayView.controlsVisible = p.getBoolean(SettingsActivity.KEY_CONTROLS_VISIBLE, true)
+            overlayView.consoleSkin = p.getInt(SettingsActivity.KEY_CONSOLE_SKIN, TouchOverlayView.SKIN_MODERN_TRANSPARENT)
             overlayView.dpadType = p.getInt(SettingsActivity.KEY_DPAD_TYPE, TouchOverlayView.DPAD_TYPE_CLASSIC)
+            overlayView.showQuickActions = p.getBoolean(SettingsActivity.KEY_SHOW_QUICK_ACTIONS, true)
+            overlayView.touchHapticsEnabled = p.getBoolean(SettingsActivity.KEY_TOUCH_HAPTICS, false)
             overlayView.controlsOpacity = p.getFloat(SettingsActivity.KEY_CONTROLS_OPACITY, 0.55f)
+            overlayView.controlsScale = p.getFloat(SettingsActivity.KEY_CONTROLS_SCALE, 1.0f)
+            overlayView.customShellColor = p.getInt(SettingsActivity.KEY_CUSTOM_SHELL_COLOR, android.graphics.Color.rgb(34, 24, 62))
+            overlayView.customButtonColor = p.getInt(SettingsActivity.KEY_CUSTOM_BTN_COLOR, android.graphics.Color.rgb(66, 52, 108))
+            overlayView.customAccentColor = p.getInt(SettingsActivity.KEY_CUSTOM_ACCENT_COLOR, android.graphics.Color.rgb(139, 92, 246))
         }
+
+        // 3b. Emulation Speed, Rewind & Hardware Sensors
+        ffSpeedMultiplier = p.getInt(SettingsActivity.KEY_FF_SPEED, 2).coerceIn(2, 4)
+        rewindEnabled = p.getBoolean(SettingsActivity.KEY_REWIND_ENABLED, true)
+        gyroEnabled = p.getBoolean(SettingsActivity.KEY_GYRO_ENABLED, true)
+        rumbleEnabled = p.getBoolean(SettingsActivity.KEY_RUMBLE_ENABLED, true)
+        solarAuto = p.getBoolean(SettingsActivity.KEY_SOLAR_AUTO, true)
+        solarManualLevel = p.getInt(SettingsActivity.KEY_SOLAR_LEVEL, 5).coerceIn(0, 10)
+        if (core.handle != 0L) {
+            core.setRewindEnabled(rewindEnabled)
+            if (fastForwardActive) {
+                core.setFastForward(ffSpeedMultiplier.toFloat())
+            }
+            if (!solarAuto) {
+                core.setSolarLevel(solarManualLevel)
+            }
+        }
+        registerHardwareSensors()
 
         // 4. Orientation
         when (p.getInt(SettingsActivity.KEY_ORIENTATION, 0)) {
@@ -528,12 +739,82 @@ class EmulationActivity : ComponentActivity(), SurfaceHolder.Callback {
         hotkeySave = p.getInt(SettingsActivity.KEY_HOTKEY_SAVE_CODE, KeyEvent.KEYCODE_BUTTON_THUMBL)
         hotkeyLoad = p.getInt(SettingsActivity.KEY_HOTKEY_LOAD_CODE, KeyEvent.KEYCODE_BUTTON_THUMBR)
         hotkeyPause = p.getInt(SettingsActivity.KEY_HOTKEY_PAUSE_CODE, 0)
+        hotkeyFf = p.getInt(SettingsActivity.KEY_HOTKEY_FF_CODE, 0)
+        hotkeyRewind = p.getInt(SettingsActivity.KEY_HOTKEY_REWIND_CODE, 0)
     }
+
+    // --- Hardware Sensors (Gyroscope, Accelerometer Tilt, Boktai Solar Light) ---
+
+    private fun registerHardwareSensors() {
+        val sm = sensorManager ?: return
+        sm.unregisterListener(this)
+        if (gyroEnabled) {
+            sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)?.let {
+                sm.registerListener(this, it, SensorManager.SENSOR_DELAY_GAME)
+            }
+            sm.getDefaultSensor(Sensor.TYPE_GYROSCOPE)?.let {
+                sm.registerListener(this, it, SensorManager.SENSOR_DELAY_GAME)
+            }
+        }
+        if (solarAuto) {
+            sm.getDefaultSensor(Sensor.TYPE_LIGHT)?.let {
+                sm.registerListener(this, it, SensorManager.SENSOR_DELAY_NORMAL)
+            }
+        }
+    }
+
+    private fun unregisterHardwareSensors() {
+        sensorManager?.unregisterListener(this)
+    }
+
+    override fun onSensorChanged(event: SensorEvent) {
+        if (core.handle == 0L) return
+        when (event.sensor.type) {
+            Sensor.TYPE_ACCELEROMETER -> {
+                // Scale gravity (~9.8 m/s^2) into mGBA's fixed-point tilt scale
+                val scale = 0x10000000.toDouble() / 9.81
+                latestTiltX = (event.values[0] * scale).toInt()
+                latestTiltY = (event.values[1] * scale).toInt()
+                core.setSensorRotation(latestTiltX, latestTiltY, latestGyroZ)
+            }
+            Sensor.TYPE_GYROSCOPE -> {
+                // Scale Z-axis angular velocity (rad/s) for WarioWare Twisted
+                val gyroScale = 0x10000000.toDouble() * 0.35
+                latestGyroZ = (-event.values[2] * gyroScale).toInt()
+                core.setSensorRotation(latestTiltX, latestTiltY, latestGyroZ)
+            }
+            Sensor.TYPE_LIGHT -> {
+                if (solarAuto) {
+                    val lux = event.values[0]
+                    val level = when {
+                        lux < 20f -> 0
+                        lux < 60f -> 1
+                        lux < 150f -> 2
+                        lux < 300f -> 3
+                        lux < 600f -> 4
+                        lux < 1200f -> 5
+                        lux < 2500f -> 6
+                        lux < 5000f -> 7
+                        lux < 9000f -> 8
+                        lux < 15000f -> 9
+                        else -> 10
+                    }
+                    core.setSolarLevel(level)
+                }
+            }
+        }
+    }
+
+    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
 
     // --- Android Lifecycle Handling ---
 
     override fun onPause() {
         super.onPause()
+        rewinding = false
+        unregisterHardwareSensors()
+        vibrator?.cancel()
+        lastRumbleState = false
         stopEmulationThread()
         if (core.handle != 0L) {
             core.saveState(0, stateDirPath)
@@ -548,7 +829,7 @@ class EmulationActivity : ComponentActivity(), SurfaceHolder.Callback {
         if (core.handle != 0L) {
             syncGameCheats()
         }
-        isPausedByMenu = false
+        isPausedByMenu = linkDialogVisible.value
         if (core.handle != 0L && surfaceReady && !running) {
             resumeEmulationThread()
         }
@@ -557,6 +838,7 @@ class EmulationActivity : ComponentActivity(), SurfaceHolder.Callback {
     override fun onDestroy() {
         stopEmulationThread()
         if (core.handle != 0L) {
+            core.disconnectLink()
             core.flushSram(sramFilePath)
             core.destroy()
         }
