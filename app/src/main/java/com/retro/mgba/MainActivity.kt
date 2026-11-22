@@ -91,6 +91,19 @@ class MainActivity : ComponentActivity() {
                         viewModel.onRemoveCustomCover(game.uri)
                         android.widget.Toast.makeText(this@MainActivity, getString(R.string.toast_cover_reset), android.widget.Toast.LENGTH_SHORT).show()
                     },
+                    onOpenCheats = { game ->
+                        val platform = if (game.system.equals("GBA", ignoreCase = true)) {
+                            com.retro.mgba.core.NativeCore.PLATFORM_GBA
+                        } else {
+                            com.retro.mgba.core.NativeCore.PLATFORM_GB
+                        }
+                        val intent = Intent(this@MainActivity, CheatsActivity::class.java).apply {
+                            putExtra(CheatsActivity.EXTRA_GAME_TITLE, game.title)
+                            putExtra(CheatsActivity.EXTRA_GAME_KEY, com.retro.mgba.data.cheats.CheatRepository.sanitizeGameTitle(game.title))
+                            putExtra(CheatsActivity.EXTRA_PLATFORM, platform)
+                        }
+                        startActivity(intent)
+                    },
                     onDeleteGame = { viewModel.onDeleteGame(it) },
                     onShowDetails = { viewModel.onShowDetails(it) },
                     onDismissDetails = { viewModel.onDismissDetails() },

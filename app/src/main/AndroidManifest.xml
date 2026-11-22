@@ -54,6 +54,14 @@
             android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|keyboard|navigation"
             android:theme="@style/Theme.RetroMgba" />
 
+        <!-- Cheats Activity -->
+        <activity
+            android:name=".CheatsActivity"
+            android:exported="false"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|keyboard|navigation"
+            android:windowSoftInputMode="adjustResize"
+            android:theme="@style/Theme.RetroMgba" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.retro.mgba.fileprovider"

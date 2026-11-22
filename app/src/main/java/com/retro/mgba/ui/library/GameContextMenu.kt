@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.PhotoLibrary
@@ -54,6 +55,7 @@ fun GameContextMenu(
     onToggleFavorite: () -> Unit,
     onAssignCover: () -> Unit,
     onRemoveCover: () -> Unit,
+    onOpenCheats: () -> Unit,
     onOpenDetails: () -> Unit,
     onRemove: () -> Unit
 ) {
@@ -127,6 +129,18 @@ fun GameContextMenu(
                 }
             )
         }
+
+        // Cheats Manager
+        DropdownMenuItem(
+            text = { Text(stringResource(R.string.cheats_title), color = TextPrimary) },
+            leadingIcon = {
+                Icon(Icons.Filled.Code, contentDescription = null, tint = AccentPrimary)
+            },
+            onClick = {
+                onDismiss()
+                onOpenCheats()
+            }
+        )
 
         // Game Details
         DropdownMenuItem(

@@ -22,6 +22,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.retro.mgba.core.NativeCore
+import com.retro.mgba.data.cheats.CheatRepository
 import com.retro.mgba.data.storage.StorageHelper
 import com.retro.mgba.overlay.TouchOverlayView
 import java.io.File
@@ -64,6 +65,7 @@ class EmulationActivity : ComponentActivity(), SurfaceHolder.Callback {
     @Volatile private var padStickMask   = 0
 
     // Save & State paths
+    private lateinit var displayGameTitle: String
     private lateinit var sanitizedGameTitle: String
     private lateinit var sramFilePath: String
     private lateinit var stateDirPath: String
@@ -108,7 +110,8 @@ class EmulationActivity : ComponentActivity(), SurfaceHolder.Callback {
         val rawTitle = intent.getStringExtra("EXTRA_GAME_TITLE")
             ?: intent.data?.lastPathSegment?.substringBeforeLast('.')
             ?: "game"
-        sanitizedGameTitle = rawTitle.replace(Regex("[^a-zA-Z0-9._ -]"), "_").trim()
+        displayGameTitle = rawTitle
+        sanitizedGameTitle = CheatRepository.sanitizeGameTitle(rawTitle)
 
         val saveDir = StorageHelper.getSaveDir(this)
         val stateBaseDir = StorageHelper.getStateDir(this)
@@ -207,9 +210,16 @@ class EmulationActivity : ComponentActivity(), SurfaceHolder.Callback {
         // Hardware reset first, then bind & restore SRAM so reset doesn't overwrite loaded battery save
         core.reset()
         core.setSramPath(sramFilePath)
+        syncGameCheats()
 
         surfaceReady = true
         resumeEmulationThread()
+    }
+
+    private fun syncGameCheats() {
+        if (core.handle == 0L || !::sanitizedGameTitle.isInitialized) return
+        val savedCheats = CheatRepository.loadCheats(this, sanitizedGameTitle)
+        CheatRepository.syncToCore(core, savedCheats)
     }
 
     private fun loadRom(uri: Uri): Boolean {
@@ -403,10 +413,18 @@ class EmulationActivity : ComponentActivity(), SurfaceHolder.Callback {
         isPausedByMenu = true
         overlayView.clearAllKeys()
 
+        val activeCheatsCount = CheatRepository.loadCheats(this, sanitizedGameTitle).count { it.enabled }
+        val cheatsLabel = if (activeCheatsCount > 0) {
+            getString(R.string.pause_cheats_active, activeCheatsCount)
+        } else {
+            getString(R.string.pause_cheats)
+        }
+
         val items = arrayOf(
             getString(R.string.pause_resume),
             getString(R.string.pause_quick_save),
             getString(R.string.pause_quick_load),
+            cheatsLabel,
             getString(R.string.pause_settings),
             getString(R.string.pause_save_and_exit)
         )
@@ -432,11 +450,20 @@ class EmulationActivity : ComponentActivity(), SurfaceHolder.Callback {
                         isPausedByMenu = false
                         applyImmersiveFullscreen()
                     }
-                    3 -> { // Open Settings Screen
+                    3 -> { // Open Cheats Manager
+                        isPausedByMenu = true
+                        val cheatsIntent = Intent(this@EmulationActivity, CheatsActivity::class.java).apply {
+                            putExtra(CheatsActivity.EXTRA_GAME_TITLE, displayGameTitle)
+                            putExtra(CheatsActivity.EXTRA_GAME_KEY, sanitizedGameTitle)
+                            putExtra(CheatsActivity.EXTRA_PLATFORM, core.getPlatform().takeIf { it >= 0 } ?: NativeCore.PLATFORM_GBA)
+                        }
+                        startActivity(cheatsIntent)
+                    }
+                    4 -> { // Open Settings Screen
                         isPausedByMenu = true
                         startActivity(Intent(this@EmulationActivity, SettingsActivity::class.java))
                     }
-                    4 -> { // Save and Exit cleanly back to library
+                    5 -> { // Save and Exit cleanly back to library
                         core.saveState(0, stateDirPath)
                         core.flushSram(sramFilePath)
                         finish()
@@ -518,6 +545,9 @@ class EmulationActivity : ComponentActivity(), SurfaceHolder.Callback {
         super.onResume()
         applyImmersiveFullscreen()
         applyUserSettings()
+        if (core.handle != 0L) {
+            syncGameCheats()
+        }
         isPausedByMenu = false
         if (core.handle != 0L && surfaceReady && !running) {
             resumeEmulationThread()

@@ -24,6 +24,9 @@
 #include <mgba/core/serialize.h>
 #include <mgba/core/interface.h>
 #include <mgba/core/blip_buf.h>
+#include <mgba/core/cheats.h>
+#include <mgba/internal/gba/cheats.h>
+#include <mgba/internal/gb/cheats.h>
 #include <mgba-util/vfs.h>
 
 #include "video/egl_renderer.h"
@@ -1070,4 +1073,179 @@ Java_com_retro_mgba_core_NativeCore_nativeGetGameCode(JNIEnv *env, jobject thiz,
     memset(code, 0, sizeof(code));
     ctx->core->getGameCode(ctx->core, code);
     return (*env)->NewStringUTF(env, code);
+}
+
+/* ========================================================================== */
+/* Cheats Subsystem (GameShark, Action Replay, CodeBreaker, Game Genie, Raw)  */
+/* ========================================================================== */
+
+static void _clearAllCheatsSafe(struct mCheatDevice *device) {
+    if (!device) return;
+    while (mCheatSetsSize(&device->cheats) > 0) {
+        size_t last = mCheatSetsSize(&device->cheats) - 1;
+        struct mCheatSet *set = *mCheatSetsGetPointer(&device->cheats, last);
+        if (set) {
+            set->enabled = false;
+            mCheatRefresh(device, set);
+            mCheatRemoveSet(device, set);
+            mCheatSetDeinit(set);
+        } else {
+            mCheatSetsShift(&device->cheats, last, 1);
+        }
+    }
+}
+
+JNIEXPORT void JNICALL
+Java_com_retro_mgba_core_NativeCore_nativeClearCheats(JNIEnv *env, jobject thiz, jlong handle) {
+    (void)env;
+    (void)thiz;
+    NativeContext *ctx = (NativeContext *)(intptr_t)handle;
+    if (!ctx) return;
+
+    pthread_mutex_lock(&ctx->mutex);
+    if (ctx->core && ctx->core->cheatDevice) {
+        struct mCheatDevice *device = ctx->core->cheatDevice(ctx->core);
+        _clearAllCheatsSafe(device);
+    }
+    pthread_mutex_unlock(&ctx->mutex);
+}
+
+JNIEXPORT jboolean JNICALL
+Java_com_retro_mgba_core_NativeCore_nativeAddCheatSet(
+    JNIEnv *env,
+    jobject thiz,
+    jlong handle,
+    jstring name,
+    jobjectArray lines,
+    jint type,
+    jboolean enabled
+) {
+    (void)thiz;
+    NativeContext *ctx = (NativeContext *)(intptr_t)handle;
+    if (!ctx || !lines) return JNI_FALSE;
+
+    jsize lineCount = (*env)->GetArrayLength(env, lines);
+    if (lineCount <= 0) return JNI_FALSE;
+
+    pthread_mutex_lock(&ctx->mutex);
+    if (!ctx->core || !ctx->core->cheatDevice) {
+        pthread_mutex_unlock(&ctx->mutex);
+        return JNI_FALSE;
+    }
+
+    struct mCheatDevice *device = ctx->core->cheatDevice(ctx->core);
+    if (!device || !device->createSet) {
+        pthread_mutex_unlock(&ctx->mutex);
+        return JNI_FALSE;
+    }
+
+    const char *cname = name ? (*env)->GetStringUTFChars(env, name, NULL) : NULL;
+    struct mCheatSet *set = device->createSet(device, cname ? cname : "Cheat");
+    if (cname) {
+        (*env)->ReleaseStringUTFChars(env, name, cname);
+    }
+    if (!set) {
+        pthread_mutex_unlock(&ctx->mutex);
+        return JNI_FALSE;
+    }
+
+    // Propagate GBA Master Code / encryption state from previous cheat set if present
+    size_t existingCount = mCheatSetsSize(&device->cheats);
+    if (existingCount > 0 && set->copyProperties) {
+        struct mCheatSet *prev = *mCheatSetsGetPointer(&device->cheats, existingCount - 1);
+        if (prev) {
+            set->copyProperties(set, prev);
+        }
+    }
+
+    int addedLines = 0;
+    bool allValid = true;
+    for (jsize i = 0; i < lineCount; ++i) {
+        jstring jline = (jstring)(*env)->GetObjectArrayElement(env, lines, i);
+        if (!jline) continue;
+        const char *cline = (*env)->GetStringUTFChars(env, jline, NULL);
+        if (cline) {
+            if (cline[0] != '\0') {
+                if (mCheatAddLine(set, cline, (int)type)) {
+                    addedLines++;
+                } else {
+                    LOGW("Rejected invalid cheat line: %s (type=%d)", cline, (int)type);
+                    allValid = false;
+                }
+            }
+            (*env)->ReleaseStringUTFChars(env, jline, cline);
+        }
+        (*env)->DeleteLocalRef(env, jline);
+        if (!allValid) break;
+    }
+
+    if (!allValid || addedLines == 0) {
+        mCheatSetDeinit(set);
+        pthread_mutex_unlock(&ctx->mutex);
+        return JNI_FALSE;
+    }
+
+    set->enabled = (bool)enabled;
+    mCheatAddSet(device, set);
+    mCheatRefresh(device, set);
+    pthread_mutex_unlock(&ctx->mutex);
+
+    LOGI("Applied cheat set (%d lines, type=%d, enabled=%d)", addedLines, (int)type, (int)enabled);
+    return JNI_TRUE;
+}
+
+JNIEXPORT jboolean JNICALL
+Java_com_retro_mgba_core_NativeCore_nativeValidateCheatLines(
+    JNIEnv *env,
+    jclass clazz,
+    jint platform,
+    jobjectArray lines,
+    jint type
+) {
+    (void)clazz;
+    if (!lines) return JNI_FALSE;
+
+    jsize lineCount = (*env)->GetArrayLength(env, lines);
+    if (lineCount <= 0) return JNI_FALSE;
+
+    struct mCheatDevice *device = NULL;
+    if (platform == mPLATFORM_GB) {
+        device = GBCheatDeviceCreate();
+    } else {
+        device = GBACheatDeviceCreate();
+    }
+    if (!device || !device->createSet) {
+        if (device) mCheatDeviceDestroy(device);
+        return JNI_FALSE;
+    }
+
+    struct mCheatSet *set = device->createSet(device, "Validate");
+    if (!set) {
+        mCheatDeviceDestroy(device);
+        return JNI_FALSE;
+    }
+
+    int addedLines = 0;
+    bool allValid = true;
+    for (jsize i = 0; i < lineCount; ++i) {
+        jstring jline = (jstring)(*env)->GetObjectArrayElement(env, lines, i);
+        if (!jline) continue;
+        const char *cline = (*env)->GetStringUTFChars(env, jline, NULL);
+        if (cline) {
+            if (cline[0] != '\0') {
+                if (mCheatAddLine(set, cline, (int)type)) {
+                    addedLines++;
+                } else {
+                    allValid = false;
+                }
+            }
+            (*env)->ReleaseStringUTFChars(env, jline, cline);
+        }
+        (*env)->DeleteLocalRef(env, jline);
+        if (!allValid) break;
+    }
+
+    mCheatSetDeinit(set);
+    mCheatDeviceDestroy(device);
+    return (allValid && addedLines > 0) ? JNI_TRUE : JNI_FALSE;
 }

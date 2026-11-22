@@ -55,6 +55,7 @@ fun LibraryScreen(
     onToggleFavorite: (GameEntity) -> Unit,
     onAssignCustomCover: (GameEntity, Uri) -> Unit,
     onRemoveCustomCover: (GameEntity) -> Unit,
+    onOpenCheats: (GameEntity) -> Unit,
     onDeleteGame: (GameEntity) -> Unit,
     onShowDetails: (GameEntity) -> Unit,
     onDismissDetails: () -> Unit,
@@ -169,6 +170,7 @@ fun LibraryScreen(
                                     imagePickerLauncher.launch("image/*")
                                 },
                                 onRemoveCover = { onRemoveCustomCover(game) },
+                                onOpenCheats = { onOpenCheats(game) },
                                 onOpenDetails = { onShowDetails(game) },
                                 onRemove = { onDeleteGame(game) }
                             )

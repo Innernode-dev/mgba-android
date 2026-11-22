@@ -66,6 +66,14 @@ object StorageHelper {
     }
 
     /**
+     * Directory for per-game cheat files (.json).
+     */
+    fun getCheatsDir(context: Context): File {
+        val base = getBaseDir(context)
+        return File(base, "cheats").also { it.mkdirs() }
+    }
+
+    /**
      * Copies selected gallery image to persistent local storage and returns file URI.
      */
     fun saveCustomCover(context: Context, gameUri: String, sourceUri: Uri): String? {
@@ -229,5 +237,6 @@ object StorageHelper {
         getStateDir(context)
         getScreenshotsDir(context)
         getCoversDir(context)
+        getCheatsDir(context)
     }
 }

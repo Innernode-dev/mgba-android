@@ -193,6 +193,17 @@ class NativeCore {
         return if (handle != 0L) nativeGetGameCode(handle) else null
     }
 
+    // --- Cheats Subsystem ---
+
+    fun clearCheats() {
+        if (handle != 0L) nativeClearCheats(handle)
+    }
+
+    fun addCheatSet(name: String, lines: List<String>, type: Int = 0, enabled: Boolean = true): Boolean {
+        if (handle == 0L || lines.isEmpty()) return false
+        return nativeAddCheatSet(handle, name, lines.toTypedArray(), type, enabled)
+    }
+
     // --- External Native Declarations (Direct JNI Bindings) ---
 
     external fun nativeCreate(sampleRate: Int, bufferFrames: Int): Long
@@ -230,6 +241,9 @@ class NativeCore {
     external fun nativeGetPlatform(handle: Long): Int
     external fun nativeGetGameTitle(handle: Long): String?
     external fun nativeGetGameCode(handle: Long): String?
+
+    external fun nativeClearCheats(handle: Long)
+    external fun nativeAddCheatSet(handle: Long, name: String, lines: Array<String>, type: Int, enabled: Boolean): Boolean
 
     companion object {
         // GBA Hardware Key Mask Constants
@@ -276,5 +290,16 @@ class NativeCore {
          */
         @JvmStatic
         external fun nativeGetCoreVersion(): String
+
+        /**
+         * Validates cheat code lines against the native mGBA GBA/GB cheat parser.
+         */
+        @JvmStatic
+        external fun nativeValidateCheatLines(platform: Int, lines: Array<String>, type: Int): Boolean
+
+        fun validateCheatLines(platform: Int, lines: List<String>, type: Int = 0): Boolean {
+            if (lines.isEmpty()) return false
+            return nativeValidateCheatLines(platform, lines.toTypedArray(), type)
+        }
     }
 }
